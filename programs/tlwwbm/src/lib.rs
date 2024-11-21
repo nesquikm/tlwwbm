@@ -56,6 +56,10 @@ pub mod tlwwbm {
     }
 
     pub fn topic_delete(ctx: Context<DeleteTopic>) -> Result<()> {
+        require!(
+            ctx.accounts.autority.key() == ctx.accounts.topic.topic_author.key(),
+            AuthError::NotAuthor
+        );
         topic::delete(ctx)
     }
 }

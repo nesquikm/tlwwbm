@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{error::TopicError, state::{config::Config, topic::Topic}};
+use crate::state::{config::Config, topic::Topic};
 
 #[derive(Accounts)]
 #[instruction(topic_string: String)]
@@ -113,11 +113,6 @@ pub fn lock(ctx: Context<LockTopic>) -> Result<()> {
 
 pub fn delete(ctx: Context<DeleteTopic>) -> Result<()> {
     msg!("Deleting a topic");
-
-    require!(
-        ctx.accounts.autority.key() == ctx.accounts.topic.topic_author.key(),
-        TopicError::NotAuthor
-    );
 
     let topic = &mut ctx.accounts.topic;
 

@@ -16,12 +16,12 @@ pub enum TopicError {
     TopicStringTooLong,
     #[msg("Comment string too long")]
     CommentStringTooLong,
-    #[msg("Can be done only by the author")]
-    NotAuthor,
 }
 
 #[error_code]
 pub enum AuthError {
     #[msg("Can be done only by the admin")]
     NotAdmin,
+    #[msg("Can be done only by the author")]
+    NotAuthor,
 }
