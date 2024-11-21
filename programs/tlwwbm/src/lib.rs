@@ -23,7 +23,7 @@ pub mod tlwwbm {
 
     pub fn config_set_topic_lock_time(ctx: Context<SetTopicLockTime>, time: u64) -> Result<()> {
         require!(
-            ctx.accounts.autority.key() == ctx.accounts.config.admin,
+            ctx.accounts.authority.key() == ctx.accounts.config.admin,
             AuthError::NotAdmin
         );
 
@@ -32,7 +32,7 @@ pub mod tlwwbm {
 
     pub fn config_delete(ctx: Context<DeleteConfig>) -> Result<()> {
         require!(
-            ctx.accounts.autority.key() == ctx.accounts.config.admin,
+            ctx.accounts.authority.key() == ctx.accounts.config.admin,
             AuthError::NotAdmin
         );
 
@@ -47,8 +47,12 @@ pub mod tlwwbm {
         topic::create(ctx, topic_string, comment_string)
     }
 
-    pub fn topic_comment(ctx: Context<CommentTopic>, comment_string: String) -> Result<()> {
-        topic::comment(ctx, comment_string)
+    pub fn topic_comment(
+        ctx: Context<CommentTopic>,
+        topic_string: String,
+        comment_string: String,
+    ) -> Result<()> {
+        topic::comment(ctx, topic_string, comment_string)
     }
 
     pub fn topic_lock(ctx: Context<LockTopic>) -> Result<()> {
@@ -57,7 +61,7 @@ pub mod tlwwbm {
 
     pub fn topic_delete(ctx: Context<DeleteTopic>) -> Result<()> {
         require!(
-            ctx.accounts.autority.key() == ctx.accounts.topic.topic_author.key(),
+            ctx.accounts.authority.key() == ctx.accounts.topic.topic_author.key(),
             AuthError::NotAuthor
         );
         topic::delete(ctx)

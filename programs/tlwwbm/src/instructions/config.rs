@@ -6,7 +6,7 @@ use crate::state::config::Config;
 pub struct InitConfig<'info> {
     #[account(
         init,
-        payer = autority,
+        payer = authority,
         space = 8 + Config::INIT_SPACE,
         seeds = [
             Config::SEED_PREFIX.as_bytes(),
@@ -15,7 +15,7 @@ pub struct InitConfig<'info> {
     )]
     pub config: Account<'info, Config>,
     #[account(mut)]
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -29,7 +29,7 @@ pub struct SetTopicLockTime<'info> {
         bump,
     )]
     pub config: Account<'info, Config>,
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
 }
 
 #[derive(Accounts)]
@@ -40,17 +40,17 @@ pub struct DeleteConfig<'info> {
             Config::SEED_PREFIX.as_bytes(),
         ],
         bump,
-        close=autority,
+        close=authority,
     )]
     pub config: Account<'info, Config>,
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
 }
 
 pub fn init(ctx: Context<InitConfig>) -> Result<()> {
     msg!("Init config");
 
     let config = &mut ctx.accounts.config;
-    config.init(ctx.accounts.autority.key)?;
+    config.init(ctx.accounts.authority.key)?;
 
     Ok(())
 }

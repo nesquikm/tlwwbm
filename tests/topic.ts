@@ -3,7 +3,13 @@ import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Tlwwbm } from "../target/types/tlwwbm";
 import { assert } from "chai";
-import { configSetTopicLockTime, configCreate, configDelete } from "./helpers";
+import {
+  configSetTopicLockTime,
+  configCreate,
+  configDelete,
+  topicFetchData,
+  newWallet,
+} from "./helpers";
 
 describe("topic", () => {
   let provider = anchor.AnchorProvider.env();
@@ -15,7 +21,7 @@ describe("topic", () => {
   let author = provider.wallet.publicKey;
 
   const topics = ["First topic", "Second topic"];
-  const comments = ["First comment", "Second comment"];
+  const comments = ["First comment", "Second comment", "Third comment"];
 
   it("Create config", async () => {
     await configCreate();
@@ -23,14 +29,9 @@ describe("topic", () => {
   });
 
   it("Is created!", async () => {
-    const tx = await program.methods.topicCreate(topics[0], comments[0]).rpc();
+    await program.methods.topicCreate(topics[0], comments[0]).rpc();
 
-    const [counterPDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from("topic"), Buffer.from(topics[0])],
-      program.programId
-    );
-
-    const topicData = await program.account.topic.fetch(counterPDA);
+    const topicData = await topicFetchData(topics[0]);
 
     assert.isTrue(topicData.topicAuthor.equals(author));
     assert.isTrue(topicData.lastCommentAuthor.equals(author));
@@ -65,9 +66,34 @@ describe("topic", () => {
       );
   });
 
-  it("Is commented!", async () => {});
+  it("Is commented!", async () => {
+    await program.methods.topicComment(topics[0], comments[1]).rpc();
 
-  it("Is commented by stranger!", async () => {});
+    const topicData = await topicFetchData(topics[0]);
+
+    assert.equal(topicData.topicString, topics[0]);
+    assert.isTrue(topicData.lastCommentAuthor.equals(author));
+    assert.equal(topicData.lastCommentString, comments[1]);
+    assert.equal(topicData.commentCount.toNumber(), 1);
+    assert.isFalse(topicData.isLocked);
+  });
+
+  it("Is commented by stranger!", async () => {
+    let stranger = await newWallet();
+
+    await program.methods
+      .topicComment(topics[0], comments[2])
+      .accounts({ authority: stranger.publicKey })
+      .signers([stranger])
+      .rpc();
+
+    const topicData = await topicFetchData(topics[0]);
+
+    assert.isTrue(topicData.lastCommentAuthor.equals(stranger.publicKey));
+    assert.equal(topicData.lastCommentString, comments[2]);
+    assert.equal(topicData.commentCount.toNumber(), 2);
+    assert.isFalse(topicData.isLocked);
+  });
 
   it("Can't be deleted because has comment", async () => {});
 

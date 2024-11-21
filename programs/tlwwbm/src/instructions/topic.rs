@@ -14,7 +14,7 @@ pub struct CreateTopic<'info> {
     pub config: Account<'info, Config>,
     #[account(
         init,
-        payer = autority,
+        payer = authority,
         space = 8 + Topic::INIT_SPACE,
         seeds = [
             Topic::SEED_PREFIX.as_bytes(),
@@ -24,7 +24,7 @@ pub struct CreateTopic<'info> {
     )]
     pub topic: Account<'info, Topic>,
     #[account(mut)]
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -40,7 +40,7 @@ pub struct CommentTopic<'info> {
         bump,
     )]
     pub topic: Account<'info, Topic>,
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
 }
 
 #[derive(Accounts)]
@@ -67,10 +67,10 @@ pub struct DeleteTopic<'info> {
             topic_string.as_bytes(),
         ],
         bump,
-        close=autority,
+        close=authority,
     )]
     pub topic: Account<'info, Topic>,
-    pub autority: Signer<'info>,
+    pub authority: Signer<'info>,
 }
 
 pub fn create(
@@ -80,7 +80,7 @@ pub fn create(
 ) -> Result<()> {
     msg!("Creating a topic");
 
-    let author = ctx.accounts.autority.key();
+    let author = ctx.accounts.authority.key();
 
     let config = &ctx.accounts.config;
 
@@ -90,10 +90,10 @@ pub fn create(
     Ok(())
 }
 
-pub fn comment(ctx: Context<CommentTopic>, comment_string: String) -> Result<()> {
+pub fn comment(ctx: Context<CommentTopic>, _topic_string: String, comment_string: String) -> Result<()> {
     msg!("Commenting a topic");
 
-    let author = ctx.accounts.autority.key();
+    let author = ctx.accounts.authority.key();
 
     let topic = &mut ctx.accounts.topic;
     topic.comment(&author, comment_string)?;

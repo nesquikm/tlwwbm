@@ -39,7 +39,7 @@ describe("config", () => {
 
     await program.methods
       .configSetTopicLockTime(new anchor.BN(69))
-      .accounts({ autority: stranger.publicKey })
+      .accounts({ authority: stranger.publicKey })
       .signers([stranger])
       .rpc()
       .then(
@@ -61,7 +61,7 @@ describe("config", () => {
 
      await program.methods
       .configDelete()
-      .accounts({ autority: stranger.publicKey })
+      .accounts({ authority: stranger.publicKey })
       .signers([stranger])
       .rpc()
       .then(

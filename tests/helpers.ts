@@ -48,3 +48,13 @@ export async function newWallet() {
 
   return wallet;
 }
+
+export async function topicFetchData(topic: string) {
+  const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
+  const [counterPDA] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from("topic"), Buffer.from(topic)],
+    program.programId
+  );
+
+  return await program.account.topic.fetch(counterPDA);
+}
