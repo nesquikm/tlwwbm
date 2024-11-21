@@ -14,19 +14,19 @@ describe("topic", () => {
 
   let author = provider.wallet.publicKey;
 
-  const topic = "New Topic Title";
-  const first_comment = "First comment";
+  const topics = ["First topic", "Second topic"];
+  const comments = ["First comment", "Second comment"];
 
   it("Create config", async () => {
     await configCreate();
-    await configSetTopicLockTime(42);
+    await configSetTopicLockTime(420);
   });
 
   it("Is created!", async () => {
-    const tx = await program.methods.topicCreate(topic, first_comment).rpc();
+    const tx = await program.methods.topicCreate(topics[0], comments[0]).rpc();
 
     const [counterPDA] = PublicKey.findProgramAddressSync(
-      [Buffer.from("topic"), Buffer.from(topic)],
+      [Buffer.from("topic"), Buffer.from(topics[0])],
       program.programId
     );
 
@@ -35,8 +35,8 @@ describe("topic", () => {
     assert.isTrue(topicData.topicAuthor.equals(author));
     assert.isTrue(topicData.lastCommentAuthor.equals(author));
 
-    assert.equal(topicData.topicString, topic);
-    assert.equal(topicData.lastCommentString, first_comment);
+    assert.equal(topicData.topicString, topics[0]);
+    assert.equal(topicData.lastCommentString, comments[0]);
 
     assert.equal(topicData.commentCount.toNumber(), 0);
 
@@ -46,12 +46,44 @@ describe("topic", () => {
     assert.isTrue(topicData.createdAt.eq(topicData.commentedAt));
 
     assert.equal(
-      topicData.createdAt.toNumber() + 42,
+      topicData.createdAt.toNumber() + 420,
       topicData.canBeLockedAfter.toNumber()
     );
 
     assert.isFalse(topicData.isLocked);
   });
+
+  it("Can't be created with same topic!", async () => {
+    await program.methods
+      .topicCreate(topics[0], comments[0])
+      .rpc()
+      .then(
+        () => {
+          assert.fail("Should have thrown an error");
+        },
+        (err: anchor.AnchorError) => {}
+      );
+  });
+
+  it("Is commented!", async () => {});
+
+  it("Is commented by stranger!", async () => {});
+
+  it("Can't be deleted because has comment", async () => {});
+
+  it("Can't be locked because time is not up", async () => {});
+
+  it("Can be locked after time is up", async () => {});
+
+  it("Created a new topic", async () => {});
+
+  it("Can be deleted", async () => {});
+
+  it("Created a new topic", async () => {});
+
+  it("Can be locked", async () => {});
+
+  it("Can't be deleted since it's locked", async () => {});
 
   it("Delete config", async () => {
     await configDelete();
