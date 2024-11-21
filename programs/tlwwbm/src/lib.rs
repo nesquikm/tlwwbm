@@ -55,15 +55,15 @@ pub mod tlwwbm {
         topic::comment(ctx, topic_string, comment_string)
     }
 
-    pub fn topic_lock(ctx: Context<LockTopic>) -> Result<()> {
-        topic::lock(ctx)
+    pub fn topic_lock(ctx: Context<LockTopic>, topic_string: String) -> Result<()> {
+        topic::lock(ctx, topic_string)
     }
 
-    pub fn topic_delete(ctx: Context<DeleteTopic>) -> Result<()> {
+    pub fn topic_delete(ctx: Context<DeleteTopic>, topic_string: String) -> Result<()> {
         require!(
             ctx.accounts.authority.key() == ctx.accounts.topic.topic_author.key(),
             AuthError::NotAuthor
         );
-        topic::delete(ctx)
+        topic::delete(ctx, topic_string)
     }
 }

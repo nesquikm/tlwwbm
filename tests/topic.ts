@@ -20,7 +20,7 @@ describe("topic", () => {
 
   let author = provider.wallet.publicKey;
 
-  const topics = ["First topic", "Second topic"];
+  const topics = ["First topic", "Second topic", "Third topic", "Fourth topic"];
   const comments = ["First comment", "Second comment", "Third comment"];
 
   it("Create config", async () => {
@@ -95,21 +95,112 @@ describe("topic", () => {
     assert.isFalse(topicData.isLocked);
   });
 
-  it("Can't be deleted because has comment", async () => {});
+  it("Can't be deleted because has comment", async () => {
+    await program.methods
+      .topicDelete(topics[0])
+      .rpc()
+      .then(
+        () => {
+          assert.fail("Should have thrown an error");
+        },
+        (err: anchor.AnchorError) => {}
+      );
+  });
 
-  it("Can't be locked because time is not up", async () => {});
+  it("Can't be locked because time is not up", async () => {
+    await program.methods
+      .topicLock(topics[0])
+      .rpc()
+      .then(
+        () => {
+          assert.fail("Should have thrown an error");
+        },
+        (err: anchor.AnchorError) => {}
+      );
+  });
 
-  it("Can be locked after time is up", async () => {});
+  it("Created a new topic with zero time to lock", async () => {
+    await configSetTopicLockTime(0);
 
-  it("Created a new topic", async () => {});
+    await program.methods.topicCreate(topics[1], comments[0]).rpc();
+  });
 
-  it("Can be deleted", async () => {});
+  it("Can be locked after time is up (zero)", async () => {
+    await program.methods.topicLock(topics[1]).rpc();
 
-  it("Created a new topic", async () => {});
+    const topicData = await topicFetchData(topics[1]);
 
-  it("Can be locked", async () => {});
+    assert.equal(topicData.commentCount.toNumber(), 0);
+    assert.isTrue(topicData.isLocked);
+  });
 
-  it("Can't be deleted since it's locked", async () => {});
+  it("Created a new topic with zero time to lock, add comment", async () => {
+    await configSetTopicLockTime(0);
+
+    await program.methods.topicCreate(topics[2], comments[0]).rpc();
+
+    let stranger = await newWallet();
+
+    await program.methods
+      .topicComment(topics[2], comments[0])
+      .accounts({ authority: stranger.publicKey })
+      .signers([stranger])
+      .rpc();
+  });
+
+  it("Can be locked after time is up (zero), with comment", async () => {
+    await program.methods.topicLock(topics[2]).rpc();
+
+    const topicData = await topicFetchData(topics[2]);
+
+    assert.equal(topicData.commentCount.toNumber(), 1);
+    assert.isTrue(topicData.isLocked);
+  });
+
+  it("Can't be deleted since it's locked", async () => {
+    await program.methods
+      .topicDelete(topics[2])
+      .rpc()
+      .then(
+        () => {
+          assert.fail("Should have thrown an error");
+        },
+        (err: anchor.AnchorError) => {}
+      );
+  });
+
+  it("Created a new topic", async () => {
+    await program.methods.topicCreate(topics[3], comments[0]).rpc();
+  });
+
+  it("Can't be deleted by stranger", async () => {
+    let stranger = await newWallet();
+
+    await program.methods
+      .topicDelete(topics[3])
+      .accounts({ authority: stranger.publicKey })
+      .signers([stranger])
+      .rpc()
+      .then(
+        () => {
+          assert.fail("Should have thrown an error");
+        },
+        (err: anchor.AnchorError) => {}
+      );
+
+      await topicFetchData(topics[3]);
+  });
+
+  it("Can be deleted", async () => {
+    await program.methods.topicDelete(topics[3]).rpc();
+
+    try {
+      await topicFetchData(topics[3]);
+      assert.fail("Should have thrown an error");
+    } catch (err) {
+      assert.isTrue(err.toString().includes("does not exist"));
+    }
+  });
 
   it("Delete config", async () => {
     await configDelete();

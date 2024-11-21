@@ -90,7 +90,11 @@ pub fn create(
     Ok(())
 }
 
-pub fn comment(ctx: Context<CommentTopic>, _topic_string: String, comment_string: String) -> Result<()> {
+pub fn comment(
+    ctx: Context<CommentTopic>,
+    _topic_string: String,
+    comment_string: String,
+) -> Result<()> {
     msg!("Commenting a topic");
 
     let author = ctx.accounts.authority.key();
@@ -101,7 +105,7 @@ pub fn comment(ctx: Context<CommentTopic>, _topic_string: String, comment_string
     Ok(())
 }
 
-pub fn lock(ctx: Context<LockTopic>) -> Result<()> {
+pub fn lock(ctx: Context<LockTopic>, _topic_string: String) -> Result<()> {
     msg!("Locking a topic");
 
     let topic = &mut ctx.accounts.topic;
@@ -111,7 +115,7 @@ pub fn lock(ctx: Context<LockTopic>) -> Result<()> {
     Ok(())
 }
 
-pub fn delete(ctx: Context<DeleteTopic>) -> Result<()> {
+pub fn delete(ctx: Context<DeleteTopic>, _topic_string: String) -> Result<()> {
     msg!("Deleting a topic");
 
     let topic = &mut ctx.accounts.topic;
