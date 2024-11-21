@@ -37,7 +37,7 @@ describe("config", () => {
   it("Can't be changed by unauthorized user!", async () => {
     let stranger = await newWallet();
 
-    const tx = await program.methods
+    await program.methods
       .configSetTopicLockTime(new anchor.BN(69))
       .accounts({ autority: stranger.publicKey })
       .signers([stranger])
@@ -59,7 +59,7 @@ describe("config", () => {
   it("Can't be deleted by unauthorized user!", async () => {
     let stranger = await newWallet();
 
-    const tx = await program.methods
+     await program.methods
       .configDelete()
       .accounts({ autority: stranger.publicKey })
       .signers([stranger])
