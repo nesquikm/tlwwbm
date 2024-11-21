@@ -1,6 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
 import { AnchorError, Program } from "@coral-xyz/anchor";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { Tlwwbm } from "../target/types/tlwwbm";
 import { assert } from "chai";
 import {
