@@ -32,6 +32,13 @@ pub struct CreateTopic<'info> {
 #[instruction(topic_string: String)]
 pub struct CommentTopic<'info> {
     #[account(
+        seeds = [
+            Config::SEED_PREFIX.as_bytes(),
+        ],
+        bump,
+    )]
+    pub config: Account<'info, Config>,
+    #[account(
         mut,
         seeds = [
             Topic::SEED_PREFIX.as_bytes(),
@@ -40,7 +47,9 @@ pub struct CommentTopic<'info> {
         bump,
     )]
     pub topic: Account<'info, Topic>,
+    #[account(mut)]
     pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -85,14 +94,15 @@ pub fn create(
     let config = &ctx.accounts.config;
 
     let topic = &mut ctx.accounts.topic;
-    topic.create(config, &author, topic_string, comment_string)?;
 
     transfer_to_topic(
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
-        ctx.accounts.topic.to_account_info(),
+        topic.to_account_info(),
         config.t_fee,
     )?;
+
+    topic.create(config, &author, topic_string, comment_string)?;
 
     Ok(())
 }
@@ -106,7 +116,17 @@ pub fn comment(
 
     let author = ctx.accounts.authority.key();
 
+    let config = &ctx.accounts.config;
+
     let topic = &mut ctx.accounts.topic;
+
+    transfer_to_topic(
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.authority.to_account_info(),
+        topic.to_account_info(),
+        config.c_fee + topic.comment_count * config.c_fee_increment,
+    )?;
+
     topic.comment(&author, comment_string)?;
 
     Ok(())

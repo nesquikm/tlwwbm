@@ -55,11 +55,17 @@ pub fn init(ctx: Context<InitConfig>) -> Result<()> {
     Ok(())
 }
 
-pub fn set(ctx: Context<SetTopicLockTime>, topic_lock_time: u64, t_fee: u64) -> Result<()> {
+pub fn set(
+    ctx: Context<SetTopicLockTime>,
+    topic_lock_time: u64,
+    t_fee: u64,
+    c_fee: u64,
+    c_fee_increment: u64,
+) -> Result<()> {
     msg!("Set topic lock time");
 
     let config = &mut ctx.accounts.config;
-    config.set(topic_lock_time, t_fee)?;
+    config.set(topic_lock_time, t_fee, c_fee, c_fee_increment)?;
 
     Ok(())
 }

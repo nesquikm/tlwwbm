@@ -15,9 +15,21 @@ export async function confingFetchData() {
   return await program.account.config.fetch(configPDA);
 }
 
-export async function configSet(lockTime: number, tFee: number) {
+export async function configSet(
+  lockTime: number,
+  tFee: number,
+  cFee: number,
+  cFeeIncrement: number
+) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
-  await program.methods.configSet(new anchor.BN(lockTime), new anchor.BN(tFee)).rpc();
+  await program.methods
+    .configSet(
+      new anchor.BN(lockTime),
+      new anchor.BN(tFee),
+      new anchor.BN(cFee),
+      new anchor.BN(cFeeIncrement)
+    )
+    .rpc();
 }
 
 export async function configDelete() {
@@ -64,7 +76,9 @@ export async function topicFetchLamports(topic: string) {
 
 export async function getRentExemption() {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
-  return await program.provider.connection.getMinimumBalanceForRentExemption(program.account.topic.size);
+  return await program.provider.connection.getMinimumBalanceForRentExemption(
+    program.account.topic.size
+  );
 }
 
 function getConfigPDA() {

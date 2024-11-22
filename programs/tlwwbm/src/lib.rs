@@ -21,13 +21,19 @@ pub mod tlwwbm {
         config::init(ctx)
     }
 
-    pub fn config_set(ctx: Context<SetTopicLockTime>, topic_lock_time: u64, t_fee: u64) -> Result<()> {
+    pub fn config_set(
+        ctx: Context<SetTopicLockTime>,
+        topic_lock_time: u64,
+        t_fee: u64,
+        c_fee: u64,
+        c_fee_increment: u64,
+    ) -> Result<()> {
         require!(
             ctx.accounts.authority.key() == ctx.accounts.config.admin,
             AuthError::NotAdmin
         );
 
-        config::set(ctx, topic_lock_time, t_fee)
+        config::set(ctx, topic_lock_time, t_fee, c_fee, c_fee_increment)
     }
 
     pub fn config_delete(ctx: Context<DeleteConfig>) -> Result<()> {
