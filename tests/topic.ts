@@ -28,7 +28,7 @@ describe("topic", () => {
     await configSet(420, 100, 200, 300);
   });
 
-  it("Is created!", async () => {
+  it("Is created", async () => {
     await program.methods.topicCreate(topics[0], comments[0]).rpc();
 
     const topicData = await topicFetchData(topics[0]);
@@ -54,7 +54,7 @@ describe("topic", () => {
     assert.isFalse(topicData.isLocked);
   });
 
-  it("Can't be created with same topic!", async () => {
+  it("Can't be created with same topic", async () => {
     await program.methods
       .topicCreate(topics[0], comments[0])
       .rpc()
@@ -66,7 +66,7 @@ describe("topic", () => {
       );
   });
 
-  it("Is commented!", async () => {
+  it("Is commented", async () => {
     await program.methods.topicComment(topics[0], comments[1]).rpc();
 
     const topicData = await topicFetchData(topics[0]);
@@ -78,7 +78,7 @@ describe("topic", () => {
     assert.isFalse(topicData.isLocked);
   });
 
-  it("Is commented by stranger!", async () => {
+  it("Is commented by stranger", async () => {
     let stranger = await newWallet();
 
     await program.methods

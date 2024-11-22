@@ -17,7 +17,7 @@ describe("config", () => {
 
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
 
-  it("Is initialized!", async () => {
+  it("Is initialized", async () => {
     await configCreate();
 
     const configData = await confingFetchData();
@@ -29,7 +29,7 @@ describe("config", () => {
     assert.equal(configData.cFeeIncrement.toNumber(), 2500000);
   });
 
-  it("Can be changed!", async () => {
+  it("Can be changed", async () => {
     await configSet(42, 99, 199, 301);
 
     const configData = await confingFetchData();
@@ -40,7 +40,7 @@ describe("config", () => {
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
   });
 
-  it("Can't be changed by unauthorized user!", async () => {
+  it("Can't be changed by unauthorized user", async () => {
     let stranger = await newWallet();
 
     await program.methods
@@ -65,7 +65,7 @@ describe("config", () => {
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
   });
 
-  it("Can't be deleted by unauthorized user!", async () => {
+  it("Can't be deleted by unauthorized user", async () => {
     let stranger = await newWallet();
 
     await program.methods
@@ -90,7 +90,7 @@ describe("config", () => {
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
   });
 
-  it("Can be deleted!", async () => {
+  it("Can be deleted", async () => {
     await configDelete();
 
     try {
@@ -101,7 +101,7 @@ describe("config", () => {
     }
   });
 
-  it("Can be created again and deleted!", async () => {
+  it("Can be created again and deleted", async () => {
     await configCreate();
 
     const configData = await confingFetchData();
