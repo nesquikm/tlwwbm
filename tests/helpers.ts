@@ -62,6 +62,11 @@ export async function topicFetchLamports(topic: string) {
   return topicInfo.lamports;
 }
 
+export async function getRentExemption() {
+  const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
+  return await program.provider.connection.getMinimumBalanceForRentExemption(program.account.topic.size);
+}
+
 function getConfigPDA() {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
   const [configPDA] = web3.PublicKey.findProgramAddressSync(
