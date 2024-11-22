@@ -3,7 +3,7 @@ import { AnchorError, Program } from "@coral-xyz/anchor";
 import { Tlwwbm } from "../target/types/tlwwbm";
 import { assert } from "chai";
 import {
-  configSetTopicLockTime,
+  configSet,
   configCreate,
   confingFetchData,
   newWallet,
@@ -24,21 +24,23 @@ describe("config", () => {
 
     assert.isTrue(configData.admin.equals(provider.wallet.publicKey));
     assert.equal(configData.topicLockTime.toNumber(), 60 * 60 * 24 * 2);
+    assert.equal(configData.tFee.toNumber(), 10000000);
   });
 
   it("Can be changed!", async () => {
-    await configSetTopicLockTime(42);
+    await configSet(42, 99);
 
     const configData = await confingFetchData();
 
     assert.equal(configData.topicLockTime.toNumber(), 42);
+    assert.equal(configData.tFee.toNumber(), 99);
   });
 
   it("Can't be changed by unauthorized user!", async () => {
     let stranger = await newWallet();
 
     await program.methods
-      .configSetTopicLockTime(new anchor.BN(69))
+      .configSet(new anchor.BN(69), new anchor.BN(199))
       .accounts({ authority: stranger.publicKey })
       .signers([stranger])
       .rpc()
@@ -54,12 +56,13 @@ describe("config", () => {
     const configData = await confingFetchData();
 
     assert.equal(configData.topicLockTime.toNumber(), 42);
+    assert.equal(configData.tFee.toNumber(), 99);
   });
 
   it("Can't be deleted by unauthorized user!", async () => {
     let stranger = await newWallet();
 
-     await program.methods
+    await program.methods
       .configDelete()
       .accounts({ authority: stranger.publicKey })
       .signers([stranger])
@@ -76,6 +79,7 @@ describe("config", () => {
     const configData = await confingFetchData();
 
     assert.equal(configData.topicLockTime.toNumber(), 42);
+    assert.equal(configData.tFee.toNumber(), 99);
   });
 
   it("Can be deleted!", async () => {

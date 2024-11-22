@@ -4,7 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 import { Tlwwbm } from "../target/types/tlwwbm";
 import { assert } from "chai";
 import {
-  configSetTopicLockTime,
+  configSet,
   configCreate,
   configDelete,
   topicFetchData,
@@ -25,7 +25,7 @@ describe("topic", () => {
 
   it("Create config", async () => {
     await configCreate();
-    await configSetTopicLockTime(420);
+    await configSet(420, 100);
   });
 
   it("Is created!", async () => {
@@ -120,7 +120,7 @@ describe("topic", () => {
   });
 
   it("Created a new topic with zero time to lock", async () => {
-    await configSetTopicLockTime(0);
+    await configSet(0, 100);
 
     await program.methods.topicCreate(topics[1], comments[0]).rpc();
   });
@@ -135,7 +135,7 @@ describe("topic", () => {
   });
 
   it("Created a new topic with zero time to lock, add comment", async () => {
-    await configSetTopicLockTime(0);
+    await configSet(0, 100);
 
     await program.methods.topicCreate(topics[2], comments[0]).rpc();
 

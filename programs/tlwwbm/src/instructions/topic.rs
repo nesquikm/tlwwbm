@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 
 use crate::state::{config::Config, topic::Topic};
 
@@ -87,6 +87,13 @@ pub fn create(
     let topic = &mut ctx.accounts.topic;
     topic.create(config, &author, topic_string, comment_string)?;
 
+    transfer_to_topic(
+        ctx.accounts.system_program.to_account_info(),
+        ctx.accounts.authority.to_account_info(),
+        ctx.accounts.topic.to_account_info(),
+        config.t_fee,
+    )?;
+
     Ok(())
 }
 
@@ -121,6 +128,24 @@ pub fn delete(ctx: Context<DeleteTopic>, _topic_string: String) -> Result<()> {
     let topic = &mut ctx.accounts.topic;
 
     topic.delete()?;
+
+    Ok(())
+}
+
+fn transfer_to_topic<'info>(
+    system_program: AccountInfo<'info>,
+    payer: AccountInfo<'info>,
+    topic: AccountInfo<'info>,
+    lamports: u64,
+) -> Result<()> {
+    let cpi_context = CpiContext::new(
+        system_program,
+        system_program::Transfer {
+            from: payer,
+            to: topic,
+        },
+    );
+    system_program::transfer(cpi_context, lamports)?;
 
     Ok(())
 }
