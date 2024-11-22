@@ -10,6 +10,7 @@ import {
   topicFetchLamports,
   getRentExemption,
 } from "./helpers";
+import { assert } from "chai";
 
 describe("transfers", () => {
   let provider = anchor.AnchorProvider.env();
@@ -20,25 +21,32 @@ describe("transfers", () => {
 
   let author = provider.wallet.publicKey;
 
-  const topics = ["First topic transfer", "Second topic transfer", "Third topic transfer", "Fourth topic transfer"];
+  const topics = [
+    "First topic transfer",
+    "Second topic transfer",
+    "Third topic transfer",
+    "Fourth topic transfer",
+  ];
   const comments = ["First comment", "Second comment", "Third comment"];
   const tFees = [100, 555];
 
   it("Create config", async () => {
     await configCreate();
-    await configSet(0, tFees[0]);
   });
 
   it("When topic create, tFee", async () => {
+    await configSet(0, tFees[0]);
     await program.methods.topicCreate(topics[0], comments[0]).rpc();
 
-    let topicLamports = await topicFetchLamports(topics[0]);
-    let rentExemption = await getRentExemption();
+    await configSet(0, tFees[1]);
+    await program.methods.topicCreate(topics[1], comments[0]).rpc();
 
-    // TODO: calculate rent exemption, add tFee and compare
-    console.log("Topic lamports: ", topicLamports);
-    console.log("tFee: ", tFees[0]);
-    console.log("Rent exemption", rentExemption);
+    let topicLamports = [
+      await topicFetchLamports(topics[0]),
+      await topicFetchLamports(topics[1]),
+    ];
+
+    assert.equal(tFees[1] - tFees[0], topicLamports[1] - topicLamports[0]);
   });
 
   it("Delete config", async () => {
