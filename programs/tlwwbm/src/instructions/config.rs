@@ -61,11 +61,13 @@ pub fn set(
     t_fee: u64,
     c_fee: u64,
     c_fee_increment: u64,
+    topic_author_share: f32,
+    last_comment_author_share: f32,
 ) -> Result<()> {
     msg!("Set topic lock time");
 
     let config = &mut ctx.accounts.config;
-    config.set(topic_lock_time, t_fee, c_fee, c_fee_increment)?;
+    config.set(topic_lock_time, t_fee, c_fee, c_fee_increment, topic_author_share, last_comment_author_share)?;
 
     Ok(())
 }

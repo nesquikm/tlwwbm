@@ -27,13 +27,15 @@ pub mod tlwwbm {
         t_fee: u64,
         c_fee: u64,
         c_fee_increment: u64,
+        topic_author_share: f32,
+        last_comment_author_share: f32,
     ) -> Result<()> {
         require!(
             ctx.accounts.authority.key() == ctx.accounts.config.admin,
             AuthError::NotAdmin
         );
 
-        config::set(ctx, topic_lock_time, t_fee, c_fee, c_fee_increment)
+        config::set(ctx, topic_lock_time, t_fee, c_fee, c_fee_increment, topic_author_share, last_comment_author_share)
     }
 
     pub fn config_delete(ctx: Context<DeleteConfig>) -> Result<()> {

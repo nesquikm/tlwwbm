@@ -26,7 +26,7 @@ describe("topic", () => {
 
   it("Create config", async () => {
     await configCreate();
-    await configSet(420, 100, 200, 300);
+    await configSet(420, 100, 200, 300, 0.25, 0.5);
   });
 
   it("Is created", async () => {
@@ -121,7 +121,7 @@ describe("topic", () => {
   });
 
   it("Created a new topic with zero time to lock", async () => {
-    await configSet(0, 100, 200, 300);
+    await configSet(0, 100, 200, 300, 0.25, 0.5);
 
     await program.methods.topicCreate(topics[1], comments[0], feeMultiplier[0]).rpc();
   });
@@ -136,7 +136,7 @@ describe("topic", () => {
   });
 
   it("Created a new topic with zero time to lock, add comment", async () => {
-    await configSet(0, 100, 200, 300);
+    await configSet(0, 100, 200, 300, 0.25, 0.5);
 
     await program.methods.topicCreate(topics[2], comments[0], feeMultiplier[0]).rpc();
 

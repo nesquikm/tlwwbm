@@ -8,6 +8,7 @@ import {
   confingFetchData,
   newWallet,
   configDelete,
+  assertNearlyEqual,
 } from "./helpers";
 
 describe("config", () => {
@@ -27,10 +28,12 @@ describe("config", () => {
     assert.equal(configData.tFee.toNumber(), 10000000);
     assert.equal(configData.cFee.toNumber(), 5000000);
     assert.equal(configData.cFeeIncrement.toNumber(), 2500000);
+    assertNearlyEqual(configData.topicAuthorShare, 0.25);
+    assertNearlyEqual(configData.lastCommentAuthorShare, 0.5);
   });
 
   it("Can be changed", async () => {
-    await configSet(42, 99, 199, 301);
+    await configSet(42, 99, 199, 301, 0.1, 0.2);
 
     const configData = await confingFetchData();
 
@@ -38,13 +41,22 @@ describe("config", () => {
     assert.equal(configData.tFee.toNumber(), 99);
     assert.equal(configData.cFee.toNumber(), 199);
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
+    assertNearlyEqual(configData.topicAuthorShare, 0.1);
+    assertNearlyEqual(configData.lastCommentAuthorShare, 0.2);
   });
 
   it("Can't be changed by unauthorized user", async () => {
     let stranger = await newWallet();
 
     await program.methods
-      .configSet(new anchor.BN(69), new anchor.BN(199), new anchor.BN(399), new anchor.BN(599))
+      .configSet(
+        new anchor.BN(69),
+        new anchor.BN(199),
+        new anchor.BN(399),
+        new anchor.BN(599),
+        0.1,
+        0.2
+      )
       .accounts({ authority: stranger.publicKey })
       .signers([stranger])
       .rpc()
@@ -63,6 +75,8 @@ describe("config", () => {
     assert.equal(configData.tFee.toNumber(), 99);
     assert.equal(configData.cFee.toNumber(), 199);
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
+    assertNearlyEqual(configData.topicAuthorShare, 0.1);
+    assertNearlyEqual(configData.lastCommentAuthorShare, 0.2);
   });
 
   it("Can't be deleted by unauthorized user", async () => {
@@ -88,6 +102,8 @@ describe("config", () => {
     assert.equal(configData.tFee.toNumber(), 99);
     assert.equal(configData.cFee.toNumber(), 199);
     assert.equal(configData.cFeeIncrement.toNumber(), 301);
+    assertNearlyEqual(configData.topicAuthorShare, 0.1);
+    assertNearlyEqual(configData.lastCommentAuthorShare, 0.2);
   });
 
   it("Can be deleted", async () => {

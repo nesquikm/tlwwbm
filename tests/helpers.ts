@@ -19,7 +19,9 @@ export async function configSet(
   lockTime: number,
   tFee: number,
   cFee: number,
-  cFeeIncrement: number
+  cFeeIncrement: number,
+  topicAuthorShare: number,
+  lastCommentAuthorShare: number
 ) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
   await program.methods
@@ -27,7 +29,9 @@ export async function configSet(
       new anchor.BN(lockTime),
       new anchor.BN(tFee),
       new anchor.BN(cFee),
-      new anchor.BN(cFeeIncrement)
+      new anchor.BN(cFeeIncrement),
+      topicAuthorShare,
+      lastCommentAuthorShare
     )
     .rpc();
 }
@@ -79,6 +83,16 @@ export async function getRentExemption() {
   return await program.provider.connection.getMinimumBalanceForRentExemption(
     program.account.topic.size
   );
+}
+
+export function nearlyEqual(a: number, b: number, epsilon: number = 0.0000001) {
+  return Math.abs(a - b) < epsilon;
+}
+
+export function assertNearlyEqual(a: number, b: number, epsilon: number = 0.0000001) {
+  if (!nearlyEqual(a, b, epsilon)) {
+    throw new Error(`Expected ${a} to be nearly equal to ${b}`);
+  }
 }
 
 function getConfigPDA() {

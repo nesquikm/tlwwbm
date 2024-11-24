@@ -48,12 +48,12 @@ describe("transfers", () => {
       `${topics[1]} ${feeMultiplier}`,
     ];
 
-    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0]);
+    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0], 0.25, 0.5);
     await program.methods
       .topicCreate(topicsWithMultipliers[0], comments[0], feeMultiplier)
       .rpc();
 
-    await configSet(0, tFees[1], cFees[0], cFeeIncrements[0]);
+    await configSet(0, tFees[1], cFees[0], cFeeIncrements[0], 0.25, 0.5);
     await program.methods
       .topicCreate(topicsWithMultipliers[1], comments[0], feeMultiplier)
       .rpc();
@@ -77,7 +77,7 @@ describe("transfers", () => {
   async function testTpoicCreateComment(feeMultiplier) {
     const topicWithMultiplier = `${topics[2]} ${feeMultiplier}`;
 
-    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0]);
+    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0], 0.25, 0.5);
     await program.methods
       .topicCreate(topicWithMultiplier, comments[0], feeMultiplier)
       .rpc();

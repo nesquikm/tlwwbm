@@ -8,6 +8,10 @@ const DEFAULT_TOPIC_LOCK_TIME: u64 = SECONDS_PER_DAY * 2;
 const DEFAULT_T_FEE: u64 = LAMPORTS_PER_SOL / 100;
 const DEFAULT_C_FEE: u64 = LAMPORTS_PER_SOL / 100 / 2;
 const DEFAULT_C_FEE_INCREMENT: u64 = LAMPORTS_PER_SOL / 100 / 4;
+
+const DEFAULT_TOPIC_AUTHOR_SHARE: f32 = 0.25;
+const DEFAULT_LAST_COMMENT_AUTHOR_SHARE: f32 = 0.5;
+
 #[account]
 #[derive(InitSpace)]
 pub struct Config {
@@ -19,6 +23,9 @@ pub struct Config {
 
     pub c_fee: u64,
     pub c_fee_increment: u64,
+
+    pub topic_author_share: f32,
+    pub last_comment_author_share: f32,
 }
 
 impl Config {
@@ -34,16 +41,30 @@ impl Config {
         self.c_fee = DEFAULT_C_FEE;
         self.c_fee_increment = DEFAULT_C_FEE_INCREMENT;
 
+        self.topic_author_share = DEFAULT_TOPIC_AUTHOR_SHARE;
+        self.last_comment_author_share = DEFAULT_LAST_COMMENT_AUTHOR_SHARE;
+
         Ok(())
     }
 
-    pub fn set(&mut self, topic_lock_time: u64, t_fee: u64, c_fee: u64, c_fee_increment: u64) -> Result<()> {
+    pub fn set(
+        &mut self,
+        topic_lock_time: u64,
+        t_fee: u64,
+        c_fee: u64,
+        c_fee_increment: u64,
+        topic_author_share: f32,
+        last_comment_author_share: f32,
+    ) -> Result<()> {
         self.topic_lock_time = topic_lock_time;
 
         self.t_fee = t_fee;
 
         self.c_fee = c_fee;
         self.c_fee_increment = c_fee_increment;
+
+        self.topic_author_share = topic_author_share;
+        self.last_comment_author_share = last_comment_author_share;
 
         Ok(())
     }
