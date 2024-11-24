@@ -86,6 +86,7 @@ pub fn create(
     ctx: Context<CreateTopic>,
     topic_string: String,
     comment_string: String,
+    fee_multiplier: u64,
 ) -> Result<()> {
     msg!("Creating a topic");
 
@@ -99,10 +100,10 @@ pub fn create(
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         topic.to_account_info(),
-        config.t_fee,
+        config.t_fee * fee_multiplier,
     )?;
 
-    topic.create(config, &author, topic_string, comment_string)?;
+    topic.create(config, &author, topic_string, comment_string, fee_multiplier)?;
 
     Ok(())
 }
@@ -124,7 +125,7 @@ pub fn comment(
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         topic.to_account_info(),
-        config.c_fee + topic.comment_count * config.c_fee_increment,
+        (config.c_fee + topic.comment_count * config.c_fee_increment) * topic.fee_multiplier,
     )?;
 
     topic.comment(&author, comment_string)?;

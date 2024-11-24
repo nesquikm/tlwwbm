@@ -22,6 +22,7 @@ describe("topic", () => {
 
   const topics = ["First topic", "Second topic", "Third topic", "Fourth topic"];
   const comments = ["First comment", "Second comment", "Third comment"];
+  const feeMultiplier = [new anchor.BN(1), new anchor.BN(3)];
 
   it("Create config", async () => {
     await configCreate();
@@ -29,7 +30,7 @@ describe("topic", () => {
   });
 
   it("Is created", async () => {
-    await program.methods.topicCreate(topics[0], comments[0]).rpc();
+    await program.methods.topicCreate(topics[0], comments[0], feeMultiplier[0]).rpc();
 
     const topicData = await topicFetchData(topics[0]);
 
@@ -56,7 +57,7 @@ describe("topic", () => {
 
   it("Can't be created with same topic", async () => {
     await program.methods
-      .topicCreate(topics[0], comments[0])
+      .topicCreate(topics[0], comments[0], feeMultiplier[0])
       .rpc()
       .then(
         () => {
@@ -122,7 +123,7 @@ describe("topic", () => {
   it("Created a new topic with zero time to lock", async () => {
     await configSet(0, 100, 200, 300);
 
-    await program.methods.topicCreate(topics[1], comments[0]).rpc();
+    await program.methods.topicCreate(topics[1], comments[0], feeMultiplier[0]).rpc();
   });
 
   it("Can be locked after time is up (zero)", async () => {
@@ -137,7 +138,7 @@ describe("topic", () => {
   it("Created a new topic with zero time to lock, add comment", async () => {
     await configSet(0, 100, 200, 300);
 
-    await program.methods.topicCreate(topics[2], comments[0]).rpc();
+    await program.methods.topicCreate(topics[2], comments[0], feeMultiplier[0]).rpc();
 
     let stranger = await newWallet();
 
@@ -170,7 +171,7 @@ describe("topic", () => {
   });
 
   it("Created a new topic", async () => {
-    await program.methods.topicCreate(topics[3], comments[0]).rpc();
+    await program.methods.topicCreate(topics[3], comments[0], feeMultiplier[0]).rpc();
   });
 
   it("Can't be deleted by stranger", async () => {

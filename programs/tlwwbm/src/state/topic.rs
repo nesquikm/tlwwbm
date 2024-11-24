@@ -27,6 +27,8 @@ pub struct Topic {
     pub can_be_locked_after: i64,
 
     pub is_locked: bool,
+
+    pub fee_multiplier: u64,
 }
 impl Topic {
     pub const SEED_PREFIX: &'static str = "topic";
@@ -37,18 +39,21 @@ impl Topic {
         author: &Pubkey,
         topic_string: String,
         comment_string: String,
+        fee_multiplier: u64,
     ) -> Result<()> {
-        require!(!topic_string.is_empty(), TopicError::EmptyTopicString);
+        require!(!topic_string.is_empty(), TopicError::TopicStringEmpty);
         require!(
             topic_string.len() <= TOPIC_STRING_MAX_LEN,
             TopicError::TopicStringTooLong
         );
 
-        require!(!comment_string.is_empty(), TopicError::EmptyCommentString);
+        require!(!comment_string.is_empty(), TopicError::CommentStringEmpty);
         require!(
             comment_string.len() <= COMMENT_STRING_MAX_LEN,
             TopicError::CommentStringTooLong
         );
+
+        require!(fee_multiplier > 0, TopicError::MultiplierZero);
 
         let now = Clock::get().unwrap().unix_timestamp;
         let can_be_locked_after = now + config.topic_lock_time as i64;
@@ -67,6 +72,8 @@ impl Topic {
         self.can_be_locked_after = can_be_locked_after;
 
         self.is_locked = false;
+
+        self.fee_multiplier = fee_multiplier;
 
         Ok(())
     }

@@ -9,13 +9,15 @@ pub enum TopicError {
     #[msg("Topic cannot be deleted")]
     NotDeletable,
     #[msg("Topic cannot be empty")]
-    EmptyTopicString,
+    TopicStringEmpty,
     #[msg("Comment cannot be empty")]
-    EmptyCommentString,
+    CommentStringEmpty,
     #[msg("Topic string too long")]
     TopicStringTooLong,
     #[msg("Comment string too long")]
     CommentStringTooLong,
+    #[msg("Miltiplier must be greater than 0")]
+    MultiplierZero,
 }
 
 #[error_code]

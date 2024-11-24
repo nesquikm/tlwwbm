@@ -49,8 +49,9 @@ pub mod tlwwbm {
         ctx: Context<CreateTopic>,
         topic_string: String,
         comment_string: String,
+        fee_multiplier: u64,
     ) -> Result<()> {
-        topic::create(ctx, topic_string, comment_string)
+        topic::create(ctx, topic_string, comment_string, fee_multiplier)
     }
 
     pub fn topic_comment(

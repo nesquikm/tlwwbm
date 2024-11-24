@@ -27,51 +27,92 @@ describe("transfers", () => {
     "Third topic transfer",
     "Fourth topic transfer",
   ];
-  const comments = ["First comment", "Second comment", "Third comment", "Fourth comment"];
+  const comments = [
+    "First comment",
+    "Second comment",
+    "Third comment",
+    "Fourth comment",
+  ];
   const tFees = [100, 555];
   const cFees = [200, 666];
-  const cFeeIncrement = [444, 777];
+  const cFeeIncrements = [444, 777];
+  const feeMultipliers = [new anchor.BN(1), new anchor.BN(3)];
 
   it("Create config", async () => {
     await configCreate();
   });
 
-  it("When create topic, tFee", async () => {
-    await configSet(0, tFees[0], cFees[0], cFeeIncrement[0]);
-    await program.methods.topicCreate(topics[0], comments[0]).rpc();
-
-    await configSet(0, tFees[1], cFees[0], cFeeIncrement[0]);
-    await program.methods.topicCreate(topics[1], comments[0]).rpc();
-
-    let topicLamports = [
-      await topicFetchLamports(topics[0]),
-      await topicFetchLamports(topics[1]),
+  async function testTopicCreate(feeMultiplier) {
+    const topicsWithMultipliers = [
+      `${topics[0]} ${feeMultiplier}`,
+      `${topics[1]} ${feeMultiplier}`,
     ];
 
-    assert.equal(tFees[1] - tFees[0], topicLamports[1] - topicLamports[0]);
+    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0]);
+    await program.methods
+      .topicCreate(topicsWithMultipliers[0], comments[0], feeMultiplier)
+      .rpc();
+
+    await configSet(0, tFees[1], cFees[0], cFeeIncrements[0]);
+    await program.methods
+      .topicCreate(topicsWithMultipliers[1], comments[0], feeMultiplier)
+      .rpc();
+
+    let topicLamports = [
+      await topicFetchLamports(topicsWithMultipliers[0]),
+      await topicFetchLamports(topicsWithMultipliers[1]),
+    ];
+
+    assert.equal(topicLamports[1] - topicLamports[0], (tFees[1] - tFees[0]) * feeMultiplier);
+  }
+
+  it(`When create topic, tFee, feeMultiplier = ${feeMultipliers[0]}`, async () => {
+    await testTopicCreate(feeMultipliers[0]);
   });
 
-  it("When comment topic create, cFee and cFeeMultiplier", async () => {
-    await configSet(0, tFees[0], cFees[0], cFeeIncrement[0]);
-    await program.methods.topicCreate(topics[2], comments[0]).rpc();
+  it(`When create topic, tFee, feeMultiplier = ${feeMultipliers[1]}`, async () => {
+    await testTopicCreate(feeMultipliers[1]);
+  });
 
-    let justCreated = await topicFetchLamports(topics[2]);
+  async function testTpoicCreateComment(feeMultiplier) {
+    const topicWithMultiplier = `${topics[2]} ${feeMultiplier}`;
 
-    await program.methods.topicComment(topics[2], comments[1]).rpc();
+    await configSet(0, tFees[0], cFees[0], cFeeIncrements[0]);
+    await program.methods
+      .topicCreate(topicWithMultiplier, comments[0], feeMultiplier)
+      .rpc();
 
-    let afterOneComment = await topicFetchLamports(topics[2]);
+    let justCreated = await topicFetchLamports(topicWithMultiplier);
 
-    await program.methods.topicComment(topics[2], comments[2]).rpc();
+    await program.methods.topicComment(topicWithMultiplier, comments[1]).rpc();
 
-    let afterTwoComments = await topicFetchLamports(topics[2]);
+    let afterOneComment = await topicFetchLamports(topicWithMultiplier);
 
-    await program.methods.topicComment(topics[2], comments[3]).rpc();
+    await program.methods.topicComment(topicWithMultiplier, comments[2]).rpc();
 
-    let afterThreeComments = await topicFetchLamports(topics[2]);
+    let afterTwoComments = await topicFetchLamports(topicWithMultiplier);
 
-    assert.equal(afterOneComment - justCreated, cFees[0]);
-    assert.equal(afterTwoComments - afterOneComment, cFees[0] + cFeeIncrement[0]);
-    assert.equal(afterThreeComments - afterTwoComments, cFees[0] + cFeeIncrement[0] * 2);
+    await program.methods.topicComment(topicWithMultiplier, comments[3]).rpc();
+
+    let afterThreeComments = await topicFetchLamports(topicWithMultiplier);
+
+    assert.equal(afterOneComment - justCreated, cFees[0] * feeMultiplier);
+    assert.equal(
+      afterTwoComments - afterOneComment,
+      (cFees[0] + cFeeIncrements[0]) * feeMultiplier
+    );
+    assert.equal(
+      afterThreeComments - afterTwoComments,
+      (cFees[0] + cFeeIncrements[0] * 2) * feeMultiplier
+    );
+  }
+
+  it(`When comment topic create and comment, cFee and cFeeMultiplier, feeMultiplier = ${feeMultipliers[0]}`, async () => {
+    await testTpoicCreateComment(feeMultipliers[0]);
+  });
+
+  it(`When comment topic create and comment, cFee and cFeeMultiplier, feeMultiplier = ${feeMultipliers[1]}`, async () => {
+    await testTpoicCreateComment(feeMultipliers[1]);
   });
 
   it("Delete config", async () => {
