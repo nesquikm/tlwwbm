@@ -29,6 +29,8 @@ pub struct Topic {
     pub is_locked: bool,
 
     pub fee_multiplier: u64,
+
+    pub raised: u64,
 }
 impl Topic {
     pub const SEED_PREFIX: &'static str = "topic";
@@ -40,6 +42,7 @@ impl Topic {
         topic_string: String,
         comment_string: String,
         fee_multiplier: u64,
+        deposit: u64,
     ) -> Result<()> {
         require!(!topic_string.is_empty(), TopicError::TopicStringEmpty);
         require!(
@@ -75,9 +78,11 @@ impl Topic {
 
         self.fee_multiplier = fee_multiplier;
 
+        self.raised = deposit;
+
         Ok(())
     }
-    pub fn comment(&mut self, author: &Pubkey, comment_string: String) -> Result<()> {
+    pub fn comment(&mut self, author: &Pubkey, comment_string: String, deposit: u64) -> Result<()> {
         require!(self.is_locked == false, TopicError::Locked);
 
         let now = Clock::get().unwrap().unix_timestamp;
@@ -86,6 +91,7 @@ impl Topic {
         self.last_comment_string = comment_string;
         self.comment_count += 1;
         self.commented_at = now;
+        self.raised += deposit;
 
         Ok(())
     }

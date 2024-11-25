@@ -1,11 +1,15 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program, web3 } from "@coral-xyz/anchor";
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { Tlwwbm } from "../target/types/tlwwbm";
 
-export async function configCreate() {
+export async function configCreate(authority: Keypair = undefined) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
-  await program.methods.configInit().rpc();
+  await program.methods
+    .configInit()
+    .accounts({ authority: authority?.publicKey })
+    .signers(authority ? [authority] : [])
+    .rpc();
 }
 
 export async function confingFetchData() {
@@ -21,7 +25,8 @@ export async function configSet(
   cFee: number,
   cFeeIncrement: number,
   topicAuthorShare: number,
-  lastCommentAuthorShare: number
+  lastCommentAuthorShare: number,
+  authority: Keypair = undefined
 ) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
   await program.methods
@@ -33,12 +38,18 @@ export async function configSet(
       topicAuthorShare,
       lastCommentAuthorShare
     )
+    .accounts({ authority: authority?.publicKey })
+    .signers(authority ? [authority] : [])
     .rpc();
 }
 
-export async function configDelete() {
+export async function configDelete(authority: Keypair = undefined) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
-  await program.methods.configDelete().rpc();
+  await program.methods
+    .configDelete()
+    .accounts({ authority: authority?.publicKey })
+    .signers(authority ? [authority] : [])
+    .rpc();
 }
 
 export async function newWallet() {
@@ -78,6 +89,14 @@ export async function topicFetchLamports(topic: string) {
   return topicInfo.lamports;
 }
 
+export async function accountFetchLamports(account: PublicKey) {
+  const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
+
+  let accountInfo = await program.provider.connection.getAccountInfo(account);
+
+  return accountInfo.lamports;
+}
+
 export async function getRentExemption() {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
   return await program.provider.connection.getMinimumBalanceForRentExemption(
@@ -89,7 +108,11 @@ export function nearlyEqual(a: number, b: number, epsilon: number = 0.0000001) {
   return Math.abs(a - b) < epsilon;
 }
 
-export function assertNearlyEqual(a: number, b: number, epsilon: number = 0.0000001) {
+export function assertNearlyEqual(
+  a: number,
+  b: number,
+  epsilon: number = 0.0000001
+) {
   if (!nearlyEqual(a, b, epsilon)) {
     throw new Error(`Expected ${a} to be nearly equal to ${b}`);
   }

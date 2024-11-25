@@ -20,7 +20,7 @@ pub struct InitConfig<'info> {
 }
 
 #[derive(Accounts)]
-pub struct SetTopicLockTime<'info> {
+pub struct SetConfig<'info> {
     #[account(
         mut,
         seeds = [
@@ -29,6 +29,7 @@ pub struct SetTopicLockTime<'info> {
         bump,
     )]
     pub config: Account<'info, Config>,
+    #[account(mut)]
     pub authority: Signer<'info>,
 }
 
@@ -43,6 +44,7 @@ pub struct DeleteConfig<'info> {
         close=authority,
     )]
     pub config: Account<'info, Config>,
+    #[account(mut)]
     pub authority: Signer<'info>,
 }
 
@@ -56,13 +58,13 @@ pub fn init(ctx: Context<InitConfig>) -> Result<()> {
 }
 
 pub fn set(
-    ctx: Context<SetTopicLockTime>,
+    ctx: Context<SetConfig>,
     topic_lock_time: u64,
     t_fee: u64,
     c_fee: u64,
     c_fee_increment: u64,
-    topic_author_share: f32,
-    last_comment_author_share: f32,
+    topic_author_share: f64,
+    last_comment_author_share: f64,
 ) -> Result<()> {
     msg!("Set topic lock time");
 

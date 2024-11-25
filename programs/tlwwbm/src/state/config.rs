@@ -9,8 +9,8 @@ const DEFAULT_T_FEE: u64 = LAMPORTS_PER_SOL / 100;
 const DEFAULT_C_FEE: u64 = LAMPORTS_PER_SOL / 100 / 2;
 const DEFAULT_C_FEE_INCREMENT: u64 = LAMPORTS_PER_SOL / 100 / 4;
 
-const DEFAULT_TOPIC_AUTHOR_SHARE: f32 = 0.25;
-const DEFAULT_LAST_COMMENT_AUTHOR_SHARE: f32 = 0.5;
+const DEFAULT_TOPIC_AUTHOR_SHARE: f64 = 0.25;
+const DEFAULT_LAST_COMMENT_AUTHOR_SHARE: f64 = 0.5;
 
 #[account]
 #[derive(InitSpace)]
@@ -24,8 +24,8 @@ pub struct Config {
     pub c_fee: u64,
     pub c_fee_increment: u64,
 
-    pub topic_author_share: f32,
-    pub last_comment_author_share: f32,
+    pub topic_author_share: f64,
+    pub last_comment_author_share: f64,
 }
 
 impl Config {
@@ -53,8 +53,8 @@ impl Config {
         t_fee: u64,
         c_fee: u64,
         c_fee_increment: u64,
-        topic_author_share: f32,
-        last_comment_author_share: f32,
+        topic_author_share: f64,
+        last_comment_author_share: f64,
     ) -> Result<()> {
         self.topic_lock_time = topic_lock_time;
 

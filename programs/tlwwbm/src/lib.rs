@@ -22,13 +22,13 @@ pub mod tlwwbm {
     }
 
     pub fn config_set(
-        ctx: Context<SetTopicLockTime>,
+        ctx: Context<SetConfig>,
         topic_lock_time: u64,
         t_fee: u64,
         c_fee: u64,
         c_fee_increment: u64,
-        topic_author_share: f32,
-        last_comment_author_share: f32,
+        topic_author_share: f64,
+        last_comment_author_share: f64,
     ) -> Result<()> {
         require!(
             ctx.accounts.authority.key() == ctx.accounts.config.admin,

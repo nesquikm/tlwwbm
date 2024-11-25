@@ -56,6 +56,13 @@ pub struct CommentTopic<'info> {
 #[instruction(topic_string: String)]
 pub struct LockTopic<'info> {
     #[account(
+        seeds = [
+            Config::SEED_PREFIX.as_bytes(),
+        ],
+        bump,
+    )]
+    pub config: Account<'info, Config>,
+    #[account(
         mut,
         seeds = [
             Topic::SEED_PREFIX.as_bytes(),
@@ -64,6 +71,15 @@ pub struct LockTopic<'info> {
         bump,
     )]
     pub topic: Account<'info, Topic>,
+    #[account(mut, address = topic.topic_author)]
+    topic_author: SystemAccount<'info>,
+    #[account(mut, address = topic.last_comment_author)]
+    last_comment_author: SystemAccount<'info>,
+    #[account(mut, address = config.admin)]
+    admin: SystemAccount<'info>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -96,14 +112,23 @@ pub fn create(
 
     let topic = &mut ctx.accounts.topic;
 
+    let deposit = config.t_fee * fee_multiplier;
+
     transfer_to_topic(
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         topic.to_account_info(),
-        config.t_fee * fee_multiplier,
+        deposit,
     )?;
 
-    topic.create(config, &author, topic_string, comment_string, fee_multiplier)?;
+    topic.create(
+        config,
+        &author,
+        topic_string,
+        comment_string,
+        fee_multiplier,
+        deposit,
+    )?;
 
     Ok(())
 }
@@ -121,14 +146,17 @@ pub fn comment(
 
     let topic = &mut ctx.accounts.topic;
 
+    let deposit =
+        (config.c_fee + topic.comment_count * config.c_fee_increment) * topic.fee_multiplier;
+
     transfer_to_topic(
         ctx.accounts.system_program.to_account_info(),
         ctx.accounts.authority.to_account_info(),
         topic.to_account_info(),
-        (config.c_fee + topic.comment_count * config.c_fee_increment) * topic.fee_multiplier,
+        deposit,
     )?;
 
-    topic.comment(&author, comment_string)?;
+    topic.comment(&author, comment_string, deposit)?;
 
     Ok(())
 }
@@ -136,7 +164,27 @@ pub fn comment(
 pub fn lock(ctx: Context<LockTopic>, _topic_string: String) -> Result<()> {
     msg!("Locking a topic");
 
+    let config = &ctx.accounts.config;
     let topic = &mut ctx.accounts.topic;
+    let author = &ctx.accounts.topic_author;
+    let last_comment_author = &ctx.accounts.last_comment_author;
+    let admin = &ctx.accounts.admin;
+
+    let raised = topic.raised;
+
+    let to_author = (raised as f64 * config.topic_author_share) as u64;
+    let to_last_comment_author = (raised as f64 * config.last_comment_author_share) as u64;
+    let to_admin = raised - to_author - to_last_comment_author;
+
+    transfer_from_topic(
+        topic.to_account_info(),
+        author.to_account_info(),
+        last_comment_author.to_account_info(),
+        admin.to_account_info(),
+        to_author,
+        to_last_comment_author,
+        to_admin,
+    )?;
 
     topic.lock()?;
 
@@ -166,7 +214,26 @@ fn transfer_to_topic<'info>(
             to: topic,
         },
     );
+
     system_program::transfer(cpi_context, lamports)?;
+
+    Ok(())
+}
+
+fn transfer_from_topic<'info>(
+    topic: AccountInfo<'info>,
+    author: AccountInfo<'info>,
+    last_comment_author: AccountInfo<'info>,
+    admin: AccountInfo<'info>,
+    to_author: u64,
+    to_last_comment_author: u64,
+    to_admin: u64,
+) -> Result<()> {
+    **topic.to_account_info().try_borrow_mut_lamports()? -= to_author + to_last_comment_author + to_admin;
+
+    **author.try_borrow_mut_lamports()? += to_author;
+    **last_comment_author.try_borrow_mut_lamports()? += to_last_comment_author;
+    **admin.try_borrow_mut_lamports()? += to_admin;
 
     Ok(())
 }

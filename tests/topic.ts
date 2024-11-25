@@ -19,6 +19,13 @@ describe("topic", () => {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
 
   let author = provider.wallet.publicKey;
+  let strangers = [];
+
+  before(async () => {
+    for (let i = 0; i < 3; i++) {
+      strangers.push(await newWallet());
+    }
+  });
 
   const topics = ["First topic", "Second topic", "Third topic", "Fourth topic"];
   const comments = ["First comment", "Second comment", "Third comment"];
@@ -30,7 +37,9 @@ describe("topic", () => {
   });
 
   it("Is created", async () => {
-    await program.methods.topicCreate(topics[0], comments[0], feeMultiplier[0]).rpc();
+    await program.methods
+      .topicCreate(topics[0], comments[0], feeMultiplier[0])
+      .rpc();
 
     const topicData = await topicFetchData(topics[0]);
 
@@ -80,7 +89,7 @@ describe("topic", () => {
   });
 
   it("Is commented by stranger", async () => {
-    let stranger = await newWallet();
+    let stranger = strangers[0];
 
     await program.methods
       .topicComment(topics[0], comments[2])
@@ -111,6 +120,11 @@ describe("topic", () => {
   it("Can't be locked because time is not up", async () => {
     await program.methods
       .topicLock(topics[0])
+      .accounts({
+        topicAuthor: author,
+        lastCommentAuthor: strangers[0].publicKey,
+        admin: author,
+      })
       .rpc()
       .then(
         () => {
@@ -123,11 +137,20 @@ describe("topic", () => {
   it("Created a new topic with zero time to lock", async () => {
     await configSet(0, 100, 200, 300, 0.25, 0.5);
 
-    await program.methods.topicCreate(topics[1], comments[0], feeMultiplier[0]).rpc();
+    await program.methods
+      .topicCreate(topics[1], comments[0], feeMultiplier[0])
+      .rpc();
   });
 
   it("Can be locked after time is up (zero)", async () => {
-    await program.methods.topicLock(topics[1]).rpc();
+    await program.methods
+      .topicLock(topics[1])
+      .accounts({
+        topicAuthor: author,
+        lastCommentAuthor: author,
+        admin: author,
+      })
+      .rpc();
 
     const topicData = await topicFetchData(topics[1]);
 
@@ -138,9 +161,11 @@ describe("topic", () => {
   it("Created a new topic with zero time to lock, add comment", async () => {
     await configSet(0, 100, 200, 300, 0.25, 0.5);
 
-    await program.methods.topicCreate(topics[2], comments[0], feeMultiplier[0]).rpc();
+    await program.methods
+      .topicCreate(topics[2], comments[0], feeMultiplier[0])
+      .rpc();
 
-    let stranger = await newWallet();
+    let stranger = strangers[1];
 
     await program.methods
       .topicComment(topics[2], comments[0])
@@ -150,7 +175,14 @@ describe("topic", () => {
   });
 
   it("Can be locked after time is up (zero), with comment", async () => {
-    await program.methods.topicLock(topics[2]).rpc();
+    await program.methods
+      .topicLock(topics[2])
+      .accounts({
+        topicAuthor: author,
+        lastCommentAuthor: strangers[1].publicKey,
+        admin: author,
+      })
+      .rpc();
 
     const topicData = await topicFetchData(topics[2]);
 
@@ -171,11 +203,13 @@ describe("topic", () => {
   });
 
   it("Created a new topic", async () => {
-    await program.methods.topicCreate(topics[3], comments[0], feeMultiplier[0]).rpc();
+    await program.methods
+      .topicCreate(topics[3], comments[0], feeMultiplier[0])
+      .rpc();
   });
 
   it("Can't be deleted by stranger", async () => {
-    let stranger = await newWallet();
+    let stranger = strangers[2];
 
     await program.methods
       .topicDelete(topics[3])
@@ -189,7 +223,7 @@ describe("topic", () => {
         (err: anchor.AnchorError) => {}
       );
 
-      await topicFetchData(topics[3]);
+    await topicFetchData(topics[3]);
   });
 
   it("Can be deleted", async () => {
