@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -10,20 +10,22 @@ import {
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import { WalletDialogProvider, WalletMultiButton } from '@solana/wallet-adapter-material-ui';
+import {
+  WalletDialogProvider,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-material-ui";
 import { clusterApiUrl } from "@solana/web3.js";
 import SelectNetwork from "./components/SelectNetwork";
 
 function App() {
-  // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
-  const network = WalletAdapterNetwork.Devnet;
-  // You can also provide a custom RPC endpoint.
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-  const wallets = useMemo(
-    () => [
-    ],
-    [network],
-  );
+  const [network, setNetwork] = useState(WalletAdapterNetwork.Devnet);
+
+  const n = WalletAdapterNetwork.Devnet;
+
+  const endpoint = useMemo(() => clusterApiUrl(n), [n]);
+  const wallets = useMemo(() => [], [n]);
+
+  console.log("Selected network", network);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
@@ -35,8 +37,8 @@ function App() {
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                   The Last Word Will Be Mine!
                 </Typography>
-                <WalletMultiButton/>
-                <SelectNetwork />
+                <WalletMultiButton />
+                <SelectNetwork network={network} setNetwork={setNetwork} />
               </Toolbar>
             </AppBar>
             <Button variant="contained">Hello World</Button>
@@ -45,7 +47,7 @@ function App() {
 
             <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
           </Container>
-          </WalletDialogProvider>
+        </WalletDialogProvider>
       </WalletProvider>
     </ConnectionProvider>
   );
