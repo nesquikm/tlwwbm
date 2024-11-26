@@ -95,6 +95,7 @@ pub struct DeleteTopic<'info> {
         close=authority,
     )]
     pub topic: Account<'info, Topic>,
+    #[account(mut)]
     pub authority: Signer<'info>,
 }
 

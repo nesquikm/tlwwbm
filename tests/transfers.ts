@@ -1,6 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
 import { Tlwwbm } from "../target/types/tlwwbm";
 import {
   configSet,
@@ -10,6 +9,7 @@ import {
   topicFetchLamports,
   newWallet,
   accountFetchLamports,
+  getRentExemption,
 } from "./helpers";
 import { assert } from "chai";
 
@@ -31,6 +31,7 @@ describe("transfers", () => {
     "Second topic transfer",
     "Third topic transfer",
     "Fourth topic transfer",
+    "Fifth topic transfer",
   ];
   const comments = [
     "First comment",
@@ -38,7 +39,7 @@ describe("transfers", () => {
     "Third comment",
     "Fourth comment",
   ];
-  const tFees = [100, 500];
+  const tFees = [100, 500, 100000000];
   const cFees = [200, 300];
   const cFeeIncrements = [444, 400];
   const feeMultipliers = [new anchor.BN(1), new anchor.BN(3)];
@@ -157,6 +158,31 @@ describe("transfers", () => {
     await testTpoicCreateComment(feeMultipliers[1]);
   });
 
+  it("When topic deleted, all funds are returned to the author", async () => {
+    await configSet(0, tFees[2], cFees[0], cFeeIncrements[0], 0.25, 0.5);
+
+    let newAuthor = await newWallet();
+
+    await program.methods
+      .topicCreate(topics[4], comments[0], feeMultipliers[0])
+      .accounts({ authority: newAuthor.publicKey })
+      .signers([newAuthor])
+      .rpc();
+
+    let authorBalanceBefore = await accountFetchLamports(newAuthor.publicKey);
+    let topicBalanceBefore = await topicFetchLamports(topics[4]);
+
+    await program.methods
+      .topicDelete(topics[4])
+      .accounts({ authority: newAuthor.publicKey })
+      .signers([newAuthor])
+      .rpc();
+
+    let authorBalanceAfter = await accountFetchLamports(newAuthor.publicKey);
+
+    assert.equal(authorBalanceAfter - authorBalanceBefore, topicBalanceBefore);
+  });
+
   it("Delete config", async () => {
     await configDelete();
   });
@@ -196,9 +222,7 @@ describe("transfers", () => {
     let commenterBalanceBefore = await accountFetchLamports(
       commenter.publicKey
     );
-    let adminBalanceBefore = await accountFetchLamports(
-      newAdmin.publicKey
-    );
+    let adminBalanceBefore = await accountFetchLamports(newAdmin.publicKey);
 
     let raised = (await topicFetchData(topics[3])).raised.toNumber();
 
@@ -217,9 +241,7 @@ describe("transfers", () => {
 
     let authorBalanceAfter = await accountFetchLamports(newAuthor.publicKey);
     let commenterBalanceAfter = await accountFetchLamports(commenter.publicKey);
-    let adminBalanceAfter = await accountFetchLamports(
-      newAdmin.publicKey
-    );
+    let adminBalanceAfter = await accountFetchLamports(newAdmin.publicKey);
 
     assert.equal(authorBalanceAfter - authorBalanceBefore, raised * 0.2);
     assert.equal(commenterBalanceAfter - commenterBalanceBefore, raised * 0.3);
