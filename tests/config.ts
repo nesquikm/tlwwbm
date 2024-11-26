@@ -45,6 +45,43 @@ describe("config", () => {
     assertNearlyEqual(configData.lastCommentAuthorShare, 0.2);
   });
 
+  it("Can't be changed with invalid shares", async () => {
+    configSet(42, 99, 199, 301, 0.9, 0.2).then(
+      () => {
+        assert.fail("Should have thrown an error");
+      },
+      (err: AnchorError) => {
+        assert.equal(err.error.errorCode.code, "InvalidShares");
+      }
+    );
+
+    configSet(42, 99, 199, 301, -0.1, 0.2).then(
+      () => {
+        assert.fail("Should have thrown an error");
+      },
+      (err: AnchorError) => {
+        assert.equal(err.error.errorCode.code, "InvalidShares");
+      }
+    );
+
+    configSet(42, 99, 199, 301, 0.1, -0.2).then(
+      () => {
+        assert.fail("Should have thrown an error");
+      },
+      (err: AnchorError) => {
+        assert.equal(err.error.errorCode.code, "InvalidShares");
+      }
+    );
+
+    const configData = await confingFetchData();
+    assert.equal(configData.topicLockTime.toNumber(), 42);
+    assert.equal(configData.tFee.toNumber(), 99);
+    assert.equal(configData.cFee.toNumber(), 199);
+    assert.equal(configData.cFeeIncrement.toNumber(), 301);
+    assertNearlyEqual(configData.topicAuthorShare, 0.1);
+    assertNearlyEqual(configData.lastCommentAuthorShare, 0.2);
+  });
+
   it("Can't be changed by unauthorized user", async () => {
     let stranger = await newWallet();
 

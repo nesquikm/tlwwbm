@@ -27,3 +27,9 @@ pub enum AuthError {
     #[msg("Can be done only by the author")]
     NotAuthor,
 }
+
+#[error_code]
+pub enum ConfigError {
+    #[msg("Share value invalid")]
+    ShareInvalid,
+}

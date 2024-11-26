@@ -3,6 +3,8 @@ use anchor_lang::prelude::*;
 use anchor_lang::solana_program::clock::SECONDS_PER_DAY;
 use anchor_lang::solana_program::native_token::LAMPORTS_PER_SOL;
 
+use crate::error::ConfigError;
+
 const DEFAULT_TOPIC_LOCK_TIME: u64 = SECONDS_PER_DAY * 2;
 
 const DEFAULT_T_FEE: u64 = LAMPORTS_PER_SOL / 100;
@@ -56,6 +58,10 @@ impl Config {
         topic_author_share: f64,
         last_comment_author_share: f64,
     ) -> Result<()> {
+        require!(topic_author_share >= 0.0, ConfigError::ShareInvalid);
+        require!(last_comment_author_share >= 0.0, ConfigError::ShareInvalid);
+        require!(topic_author_share + last_comment_author_share <= 1.0, ConfigError::ShareInvalid);
+
         self.topic_lock_time = topic_lock_time;
 
         self.t_fee = t_fee;

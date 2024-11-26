@@ -29,7 +29,7 @@ export async function configSet(
   authority: Keypair = undefined
 ) {
   const program = anchor.workspace.Tlwwbm as Program<Tlwwbm>;
-  await program.methods
+  return program.methods
     .configSet(
       new anchor.BN(lockTime),
       new anchor.BN(tFee),
