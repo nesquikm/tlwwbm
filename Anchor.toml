@@ -8,11 +8,18 @@ skip-lint = false
 [programs.localnet]
 tlwwbm = "38xz437giEUwsXjfHb7mJnYmTysz8jf4qoroPKBbj8aN"
 
+[programs.devnet]
+counter = "38xz437giEUwsXjfHb7mJnYmTysz8jf4qoroPKBbj8aN"
+
 [registry]
 url = "https://api.apr.dev"
 
+# [provider]
+# cluster = "Localnet"
+# wallet = "~/.config/solana/id.json"
+
 [provider]
-cluster = "Localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

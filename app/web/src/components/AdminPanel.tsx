@@ -4,14 +4,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { formatSol } from "./helpers";
-import { UserContext } from "./UserProvider";
+import { useUser } from "./UserProvider";
+import { ConfigContext } from "./ConfigProvider";
 
 export default function AdminPanel() {
   const { publicKey } = useWallet();
 
-  const { userData } = useContext(UserContext);
+  const { userData } = useUser();
+  const { configData } = useContext(ConfigContext);
 
   if (!publicKey) return null;
+
+  console.log("Config data:", configData);
 
   return (
     <Paper>
