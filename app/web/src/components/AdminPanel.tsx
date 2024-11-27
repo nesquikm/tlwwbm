@@ -111,7 +111,7 @@ export default function AdminPanel() {
         <TextField
           label="cFeeIncrement"
           type="string"
-          value={formatSol(cFee)}
+          value={formatSol(cFeeIncrement)}
           onChange={(e) =>
             setCFeeIncrement(new BN(Number(e.target.value) * LAMPORTS_PER_SOL))
           }

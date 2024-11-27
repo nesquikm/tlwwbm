@@ -8,7 +8,6 @@ import {
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useProgram } from "./ProgramProvider";
 import { PublicKey } from "@solana/web3.js";
-import { Buffer } from "buffer";
 import { BN } from "@coral-xyz/anchor";
 
 const accountName = "config";
