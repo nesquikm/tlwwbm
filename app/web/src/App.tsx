@@ -15,6 +15,7 @@ import {
 } from "@solana/wallet-adapter-material-ui";
 import SelectNetwork, { getDefaultEndpoint } from "./components/SelectNetwork";
 import AdminPanel from "./components/AdminPanel";
+import { UserProvider } from "./components/UserProvider";
 
 function App() {
   const [endpoint, setEndpoint] = useState(getDefaultEndpoint());
@@ -26,23 +27,28 @@ function App() {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletDialogProvider>
-          <Container>
-            <AppBar position="static">
-              <Toolbar>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                  The Last Word Will Be Mine!
-                </Typography>
-                <WalletMultiButton />
-                <SelectNetwork endpoint={endpoint} setEndpoint={setEndpoint} />
-              </Toolbar>
-            </AppBar>
-            <AdminPanel />
-            <Button variant="contained">Hello World</Button>
-            <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
-            <Box sx={{ bgcolor: "#00FF00", height: "10vh", width: "10vh" }} />
+          <UserProvider>
+            <Container>
+              <AppBar position="static">
+                <Toolbar>
+                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    The Last Word Will Be Mine!
+                  </Typography>
+                  <WalletMultiButton />
+                  <SelectNetwork
+                    endpoint={endpoint}
+                    setEndpoint={setEndpoint}
+                  />
+                </Toolbar>
+              </AppBar>
+              <AdminPanel />
+              <Button variant="contained">Hello World</Button>
+              <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
+              <Box sx={{ bgcolor: "#00FF00", height: "10vh", width: "10vh" }} />
 
-            <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
-          </Container>
+              <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
+            </Container>
+          </UserProvider>
         </WalletDialogProvider>
       </WalletProvider>
     </ConnectionProvider>
