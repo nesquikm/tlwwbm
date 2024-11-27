@@ -7,12 +7,13 @@ import {
   useState,
 } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { BN } from "@coral-xyz/anchor";
 
 // Define the type alias for userData
-type UserData = { balance: number } | null;
+type UserData = { balance: BN };
 
 interface UserContextState {
-  userData: UserData;
+  userData: UserData | null;
 }
 
 const UserContext = createContext<UserContextState>({} as UserContextState);
@@ -25,7 +26,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
-  const [userData, setUserData] = useState<UserData>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   useEffect(() => {
     if (!publicKey) return;
@@ -36,7 +37,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
       try {
         connection.getBalance(publicKey).then((balance) => {
           console.log("Fetched user data balance:", balance);
-          setUserData({ balance });
+          setUserData({ balance: new BN(balance) });
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -49,7 +50,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
       publicKey,
       (accountInfo) => {
         console.log("Changed user data:", accountInfo);
-        setUserData({ balance: accountInfo.lamports });
+        setUserData({ balance: new BN(accountInfo.lamports) });
       }
     );
 

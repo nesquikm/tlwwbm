@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useProgram } from "./ProgramProvider";
 import { PublicKey } from "@solana/web3.js";
 import { Buffer } from "buffer";
@@ -13,21 +13,28 @@ import { BN } from "@coral-xyz/anchor";
 
 const accountName = "config";
 
-type ConfigData =
-  | {
-      admin: PublicKey;
-      topicLockTime: BN;
-      tFee: BN;
-      cFee: BN;
-      cFeeIncrement: BN;
-      topicAuthorShare: number;
-      lastCommentAuthorShare: number;
-    }
-  | null
-  | undefined;
+type ConfigData = {
+  admin: PublicKey;
+  topicLockTime: BN;
+  tFee: BN;
+  cFee: BN;
+  cFeeIncrement: BN;
+  topicAuthorShare: number;
+  lastCommentAuthorShare: number;
+};
+
+type UpdateConfigData = {
+  topicLockTime: BN;
+  tFee: BN;
+  cFee: BN;
+  cFeeIncrement: BN;
+  topicAuthorShare: number;
+  lastCommentAuthorShare: number;
+};
 
 interface ConfigContextState {
-  configData: ConfigData;
+  configData: ConfigData | null | undefined;
+  updateConfigData: (configData: UpdateConfigData) => void;
 }
 
 export const ConfigContext = createContext<ConfigContextState>(
@@ -39,6 +46,7 @@ interface ConfigProviderProps {
 }
 
 export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
+  const { sendTransaction, publicKey } = useWallet();
   const { program } = useProgram();
 
   const [configPDA] = PublicKey.findProgramAddressSync(
@@ -48,7 +56,9 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
 
   const { connection } = useConnection();
 
-  const [configData, setConfigData] = useState<ConfigData>(null);
+  const [configData, setConfigData] = useState<ConfigData | null | undefined>(
+    null
+  );
 
   useEffect(() => {
     setConfigData(null);
@@ -87,8 +97,35 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
     };
   }, [connection]);
 
+  const updateConfigDataCallback = async (data: UpdateConfigData) => {
+    try {
+      const transaction = await program.methods
+        .configSet(
+          data.topicLockTime,
+          data.tFee,
+          data.cFee,
+          data.cFeeIncrement,
+          data.topicAuthorShare,
+          data.lastCommentAuthorShare
+        )
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log(`Config data changed: ${transactionSignature}`);
+    } catch (error) {
+      console.error("Error setting config data:", error);
+    }
+  };
+
   return (
-    <ConfigContext.Provider value={{ configData }}>
+    <ConfigContext.Provider
+      value={{ configData, updateConfigData: updateConfigDataCallback }}
+    >
       {children}
     </ConfigContext.Provider>
   );

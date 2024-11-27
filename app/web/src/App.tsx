@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
-import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -50,17 +48,6 @@ function App() {
                     </Toolbar>
                   </AppBar>
                   <AdminPanel />
-                  <Button variant="contained">Hello World</Button>
-                  <Box
-                    sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }}
-                  />
-                  <Box
-                    sx={{ bgcolor: "#00FF00", height: "10vh", width: "10vh" }}
-                  />
-
-                  <Box
-                    sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }}
-                  />
                 </Container>
               </ConfigProvider>
             </ProgramProvider>
