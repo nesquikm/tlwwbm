@@ -9,23 +9,18 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   WalletDialogProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-material-ui";
-import { clusterApiUrl } from "@solana/web3.js";
-import SelectNetwork from "./components/SelectNetwork";
+import SelectNetwork, { getDefaultEndpoint } from "./components/SelectNetwork";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
-  const [network, setNetwork] = useState(WalletAdapterNetwork.Devnet);
+  const [endpoint, setEndpoint] = useState(getDefaultEndpoint());
+  const wallets = useMemo(() => [], [endpoint]);
 
-  const n = WalletAdapterNetwork.Devnet;
-
-  const endpoint = useMemo(() => clusterApiUrl(n), [n]);
-  const wallets = useMemo(() => [], [n]);
-
-  console.log("Selected network", network);
+  console.log("Selected endpoint", endpoint);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
@@ -38,9 +33,10 @@ function App() {
                   The Last Word Will Be Mine!
                 </Typography>
                 <WalletMultiButton />
-                <SelectNetwork network={network} setNetwork={setNetwork} />
+                <SelectNetwork endpoint={endpoint} setEndpoint={setEndpoint} />
               </Toolbar>
             </AppBar>
+            <AdminPanel />
             <Button variant="contained">Hello World</Button>
             <Box sx={{ bgcolor: "#FF0000", height: "10vh", width: "10vh" }} />
             <Box sx={{ bgcolor: "#00FF00", height: "10vh", width: "10vh" }} />
