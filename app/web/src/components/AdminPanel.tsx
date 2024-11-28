@@ -15,7 +15,8 @@ export default function AdminPanel() {
   const { publicKey } = useWallet();
 
   const { userData } = useUser();
-  const { configData, updateConfigData, initConfigData, deleteConfigData } = useConfig();
+  const { configData, updateConfigData, initConfigData, deleteConfigData } =
+    useConfig();
 
   const [tFee, setTFee] = useState(configData?.tFee ?? new BN(0));
   const [cFee, setCFee] = useState(configData?.cFee ?? new BN(0));
@@ -83,9 +84,9 @@ export default function AdminPanel() {
   }
 
   return (
-    <Paper sx={{ mt: 2 }}>
+    <Paper sx={{ mt: 2, pl: 2, pr: 2 }}>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
         <Typography variant="subtitle2" component="div">
@@ -93,7 +94,7 @@ export default function AdminPanel() {
           {userData ? formatSol(userData.balance) : "Loading..."}
         </Typography>
       </Toolbar>
-      <Grid container spacing={1} sx={{ pl: 2, pr: 2 }}>
+      <Grid container spacing={1}>
         <TextField
           label="tFee"
           type="string"
@@ -146,7 +147,7 @@ export default function AdminPanel() {
           )}
         />
       </Grid>
-      <Grid container spacing={1} sx={{ pt: 2, pl: 2, pr: 2 }}>
+      <Grid container spacing={1} sx={{ pt: 2 }}>
         <TextField
           label="Topic author share"
           type="number"
@@ -190,7 +191,7 @@ export default function AdminPanel() {
           helperText={showIfDiffers(topicLockTime, configData.topicLockTime)}
         />
       </Grid>
-      <Grid container spacing={1} sx={{ pt: 2, pl: 2, pr: 2 }}>
+      <Grid container spacing={1} sx={{ pt: 2 }}>
         <TextField
           label="fuse (DeLeTe)"
           type="string"
@@ -207,7 +208,7 @@ export default function AdminPanel() {
           Delete config
         </Button>
       </Grid>
-      <Button sx={{ m: 2 }} onClick={updateData} variant="contained">
+      <Button sx={{ mt: 2, mb: 2 }} onClick={updateData} variant="contained">
         Update
       </Button>
     </Paper>

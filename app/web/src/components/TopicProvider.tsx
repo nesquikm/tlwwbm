@@ -13,7 +13,7 @@ import { BN } from "@coral-xyz/anchor";
 
 const accountName = "topic";
 
-type TopicData = {
+export type TopicData = {
   topicAuthor: PublicKey;
   lastCommentAuthor: PublicKey;
 
@@ -47,6 +47,7 @@ interface TopicContextState {
   commentTopicData: (topicData: CommentTopicData) => void;
   lockTopicData: () => void;
   deleteTopicData: () => void;
+  getTopics: () => Promise<TopicData[]>;
 }
 
 export const TopicContext = createContext<TopicContextState>(
@@ -194,6 +195,38 @@ export const TopicProvider: FC<TopicProviderProps> = ({
     }
   };
 
+  const getTopicsCallback = async () => {
+    try {
+      const topics = await connection.getProgramAccounts(
+        program.programId
+        // {
+        //   filters: [
+        //     {
+        //       dataSize: program.account.topic.size,
+        //     },
+        //   ],
+        // }
+      );
+      const decodedTopics = topics
+        .map((topic) => {
+          try {
+            return program.coder.accounts.decode(
+              accountName,
+              topic.account.data
+            );
+          } catch (error) {
+            return null;
+          }
+        })
+        .filter((topic) => topic !== null) as TopicData[];
+      console.log("Fetched topic:", decodedTopics);
+      return decodedTopics;
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      return [];
+    }
+  };
+
   return (
     <TopicContext.Provider
       value={{
@@ -202,6 +235,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         commentTopicData: commentTopicDataCallback,
         lockTopicData: lockTopicDataCallback,
         deleteTopicData: deleteTopicDataCallback,
+        getTopics: getTopicsCallback,
       }}
     >
       {children}
