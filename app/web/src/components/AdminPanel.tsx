@@ -85,7 +85,7 @@ export default function AdminPanel() {
   return (
     <Paper sx={{ mt: 2 }}>
       <Toolbar>
-        <Typography variant="subtitle1" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
         <Typography variant="subtitle2" component="div">

@@ -1,0 +1,220 @@
+import {
+  createContext,
+  type FC,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useProgram } from "./ProgramProvider";
+import { PublicKey } from "@solana/web3.js";
+import { BN } from "@coral-xyz/anchor";
+
+const accountName = "topic";
+
+type TopicData = {
+  topicAuthor: PublicKey;
+  lastCommentAuthor: PublicKey;
+
+  topicString: string;
+  lastCommentString: string;
+
+  commentCount: BN;
+
+  createdAt: BN;
+  commentedAt: BN;
+
+  canBeLockedAfter: BN;
+  isLocked: boolean;
+  feeMultiplier: BN;
+  raised: BN;
+};
+
+type CreateTopicData = {
+  topicString: string;
+  lastCommentString: string;
+  feeMultiplier: BN;
+};
+
+type CommentTopicData = {
+  commentString: string;
+};
+
+interface TopicContextState {
+  topicData: TopicData | null | undefined;
+  createTopicData: (topicData: CreateTopicData) => void;
+  commentTopicData: (topicData: CommentTopicData) => void;
+  lockTopicData: () => void;
+  deleteTopicData: () => void;
+}
+
+export const TopicContext = createContext<TopicContextState>(
+  {} as TopicContextState
+);
+
+interface TopicProviderProps {
+  children: ReactNode;
+  topicString: string | null;
+}
+
+export const TopicProvider: FC<TopicProviderProps> = ({
+  children,
+  topicString,
+}) => {
+  const { sendTransaction, publicKey } = useWallet();
+  const { program } = useProgram();
+
+  const { connection } = useConnection();
+
+  const [topicData, setTopicData] = useState<TopicData | null | undefined>(
+    null
+  );
+
+  useEffect(() => {
+    if (topicString === null) {
+      setTopicData(undefined);
+    } else {
+      setTopicData(null);
+
+      const [topicPDA] = PublicKey.findProgramAddressSync(
+        [Buffer.from(accountName), Buffer.from(topicString)],
+        program.programId
+      );
+
+      const fetchTopicData = async () => {
+        try {
+          const data = await program.account.topic.fetch(topicPDA);
+          console.log("Fetched topic data:", data);
+          setTopicData(topicData);
+        } catch (error) {
+          console.error("Error fetching topic data:", error);
+          setTopicData(undefined);
+        }
+      };
+
+      fetchTopicData();
+
+      const subscriptionId = connection.onAccountChange(
+        topicPDA,
+        (accountInfo) => {
+          try {
+            console.log("Changed topic data:", accountInfo);
+            const decodedData = program.coder.accounts.decode(
+              accountName,
+              accountInfo.data
+            );
+            setTopicData(decodedData);
+          } catch (error) {
+            console.error("Error decoding topic data:", error);
+          }
+        }
+      );
+
+      return () => {
+        connection.removeAccountChangeListener(subscriptionId);
+      };
+    }
+  }, [connection, topicString]);
+
+  const createTopicDataCallback = async (data: CreateTopicData) => {
+    try {
+      const transaction = await program.methods
+        .topicCreate(
+          data.topicString,
+          data.lastCommentString,
+          data.feeMultiplier
+        )
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log("Sent create topic transaction:", transactionSignature);
+    } catch (error) {
+      console.error("Error creating topic data:", error);
+    }
+  };
+
+  const commentTopicDataCallback = async (data: CommentTopicData) => {
+    try {
+      const transaction = await program.methods
+        .topicComment(topicString!, data.commentString)
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log("Sent comment topic transaction:", transactionSignature);
+    } catch (error) {
+      console.error("Error commenting topic data:", error);
+    }
+  };
+
+  const lockTopicDataCallback = async () => {
+    try {
+      const transaction = await program.methods
+        .topicLock(topicString!)
+        .transaction();
+
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log("Sent lock topic transaction:", transactionSignature);
+    } catch (error) {
+      console.error("Error locking topic data:", error);
+    }
+  };
+
+  const deleteTopicDataCallback = async () => {
+    try {
+      const transaction = await program.methods
+        .topicDelete(topicString!)
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log("Sent delete topic transaction:", transactionSignature);
+    } catch (error) {
+      console.error("Error deleting topic data:", error);
+    }
+  };
+
+  return (
+    <TopicContext.Provider
+      value={{
+        topicData,
+        createTopicData: createTopicDataCallback,
+        commentTopicData: commentTopicDataCallback,
+        lockTopicData: lockTopicDataCallback,
+        deleteTopicData: deleteTopicDataCallback,
+      }}
+    >
+      {children}
+    </TopicContext.Provider>
+  );
+};
+
+export const useTopic = () => {
+  const context = useContext(TopicContext);
+
+  if (context === undefined) {
+    throw new Error("useTopic must be used within a TopicProvider");
+  }
+
+  return context;
+};

@@ -16,6 +16,8 @@ import AdminPanel from "./components/AdminPanel";
 import { UserProvider } from "./components/UserProvider";
 import { ProgramProvider } from "./components/ProgramProvider";
 import { ConfigProvider } from "./components/ConfigProvider";
+import CreateTopicPanel from "./components/CreateTopicPanel";
+import { TopicProvider } from "./components/TopicProvider";
 
 function App() {
   const [endpoint, setEndpoint] = useState(getDefaultEndpoint());
@@ -48,6 +50,9 @@ function App() {
                     </Toolbar>
                   </AppBar>
                   <AdminPanel />
+                  <TopicProvider topicString={null}>
+                  <CreateTopicPanel />
+                  </TopicProvider>
                 </Container>
               </ConfigProvider>
             </ProgramProvider>
