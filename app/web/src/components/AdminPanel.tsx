@@ -15,7 +15,8 @@ export default function AdminPanel() {
   const { publicKey } = useWallet();
 
   const { userData } = useUser();
-  const { configData, updateConfigData } = useContext(ConfigContext);
+  const { configData, updateConfigData, initConfigData, deleteConfigData } =
+    useContext(ConfigContext);
 
   const [tFee, setTFee] = useState(configData?.tFee ?? new BN(0));
   const [cFee, setCFee] = useState(configData?.cFee ?? new BN(0));
@@ -31,6 +32,8 @@ export default function AdminPanel() {
   const [topicLockTime, setTopicLockTime] = useState(
     configData?.topicLockTime ?? new BN(0)
   );
+
+  const [canDelete, setCanDelete] = useState(false);
 
   useEffect(() => {
     setTFee(configData?.tFee ?? new BN(0));
@@ -51,11 +54,7 @@ export default function AdminPanel() {
     return null;
   }
 
-  if (configData === undefined) {
-    return <Paper sx={{ mt: 2 }}>Should init it first</Paper>;
-  }
-
-  function update() {
+  function updateData() {
     updateConfigData({
       tFee: tFee,
       cFee: cFee,
@@ -64,6 +63,24 @@ export default function AdminPanel() {
       lastCommentAuthorShare: lastCommentAuthorShare,
       topicLockTime: topicLockTime,
     });
+  }
+
+  function deleteData() {
+    deleteConfigData();
+  }
+
+  function initData() {
+    initConfigData();
+  }
+
+  if (configData === undefined) {
+    return (
+      <Paper sx={{ mt: 2 }}>
+        <Button onClick={initData} sx={{ m: 2 }} variant="outlined">
+          Init config
+        </Button>
+      </Paper>
+    );
   }
 
   return (
@@ -171,13 +188,27 @@ export default function AdminPanel() {
               shrink: true,
             },
           }}
-          helperText={showIfDiffers(
-            topicLockTime,
-            configData.topicLockTime
-          )}
+          helperText={showIfDiffers(topicLockTime, configData.topicLockTime)}
         />
       </Grid>
-      <Button sx={{ m: 2 }} onClick={update} variant="contained">
+      <Grid container spacing={1} sx={{ pt: 2, pl: 2, pr: 2 }}>
+        <TextField
+          label="fuse (DeLeTe)"
+          type="string"
+          onChange={(e) =>
+            setCanDelete(e.target.value === "DeLeTe" ? true : false)
+          }
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+          }}
+        />
+        <Button onClick={deleteData} variant="outlined" disabled={!canDelete}>
+          Delete config
+        </Button>
+      </Grid>
+      <Button sx={{ m: 2 }} onClick={updateData} variant="contained">
         Update
       </Button>
     </Paper>

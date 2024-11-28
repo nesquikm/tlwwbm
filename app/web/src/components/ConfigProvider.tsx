@@ -34,6 +34,8 @@ type UpdateConfigData = {
 interface ConfigContextState {
   configData: ConfigData | null | undefined;
   updateConfigData: (configData: UpdateConfigData) => void;
+  initConfigData: () => void;
+  deleteConfigData: () => void;
 }
 
 export const ConfigContext = createContext<ConfigContextState>(
@@ -121,9 +123,50 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
     }
   };
 
+  const initConfigDataCallback = async () => {
+    try {
+      const transaction = await program.methods
+        .configInit()
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log(`Config data initialized: ${transactionSignature}`);
+    } catch (error) {
+      console.error("Error initializing config data:", error);
+    }
+  };
+
+  const deleteConfigDataCallback = async () => {
+    try {
+      const transaction = await program.methods
+        .configDelete()
+        .accounts({
+          authority: publicKey!,
+        })
+        .transaction();
+      const transactionSignature = await sendTransaction(
+        transaction,
+        connection
+      );
+      console.log(`Config data deleted: ${transactionSignature}`);
+    } catch (error) {
+      console.error("Error deleting config data:", error);
+    }
+  };
+
   return (
     <ConfigContext.Provider
-      value={{ configData, updateConfigData: updateConfigDataCallback }}
+      value={{
+        configData,
+        updateConfigData: updateConfigDataCallback,
+        initConfigData: initConfigDataCallback,
+        deleteConfigData: deleteConfigDataCallback,
+      }}
     >
       {children}
     </ConfigContext.Provider>
