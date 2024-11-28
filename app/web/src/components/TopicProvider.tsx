@@ -74,7 +74,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
 
   useEffect(() => {
     if (topicString === null) {
-      setTopicData(undefined);
+      setTopicData(null);
     } else {
       setTopicData(null);
 
@@ -108,6 +108,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
             setTopicData(decodedData);
           } catch (error) {
             console.error("Error decoding topic data:", error);
+            setTopicData(undefined);
           }
         }
       );
