@@ -44,7 +44,11 @@ export default function AdminPanel() {
   if (!publicKey) return null;
 
   if (configData === null) {
-    return <Paper sx={{ mt: 2 }}>Loading...</Paper>;
+    return null;
+  }
+
+  if (configData?.admin.equals(publicKey) === false) {
+    return null;
   }
 
   if (configData === undefined) {
