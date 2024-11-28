@@ -11,11 +11,17 @@ import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ListItemButton from "@mui/material/ListItemButton";
+import { useLocation, useNavigate } from "react-router";
+import TopicDialog from "./TopicDialog";
 
 export default function TopicsPanel() {
   const { getTopics } = useTopic();
+  let location = useLocation();
+  let navigate = useNavigate();
 
   const [topics, setTopics] = useState([] as TopicData[]);
+  const [activeTopic, setActiveTopic] = useState(null as string | null);
 
   const fetchTopics = async () => {
     const topics = await getTopics();
@@ -23,10 +29,21 @@ export default function TopicsPanel() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const topic = params.get("topic");
+    setActiveTopic(topic);
+    console.log(`Location changed: ${topic}`);
+  }, [location]);
+
+  useEffect(() => {
     setTopics([]);
 
     fetchTopics();
   }, []);
+
+  function onTopicDialogClose() {
+    navigate("");
+  }
 
   return (
     <Paper sx={{ mt: 2, pl: 2, pr: 2 }}>
@@ -41,41 +58,51 @@ export default function TopicsPanel() {
       <List sx={{ width: "100%" }}>
         {topics.map((topic) => TopicListItem(topic))}
       </List>
+      <TopicDialog
+        topicString={activeTopic}
+        onClose={onTopicDialogClose}
+      />
     </Paper>
   );
-}
 
-function TopicListItem(topic: TopicData) {
-  const canBeLockedDate = topic.canBeLockedAfter.toNumber() * 1000;
-  const canBeLockedString =
-    Date.now() > canBeLockedDate
-      ? "NOW"
-      : new Date(canBeLockedDate).toLocaleString();
+  function showTopic(topic: TopicData) {
+    navigate("?topic=" + topic.topicString);
+  }
 
-  const lockString = topic.isLocked
-    ? "Locked"
-    : "Can be locked: " + canBeLockedString;
+  function TopicListItem(topic: TopicData) {
+    const canBeLockedDate = topic.canBeLockedAfter.toNumber() * 1000;
+    const canBeLockedString =
+      Date.now() > canBeLockedDate
+        ? "NOW"
+        : new Date(canBeLockedDate).toLocaleString();
 
-  return (
-    <Box key={topic.topicString}>
-      <ListItem>
-        <ListItemText
-          primary={topic.topicString + " : " + topic.lastCommentString}
-          secondary={
-            "Fee Multiplier: " +
-            topic.feeMultiplier.toString() +
-            " - " +
-            "Raised: " +
-            formatSol(topic.raised) +
-            " - " +
-            "Comment Count: " +
-            topic.commentCount.toString() +
-            " - " +
-            lockString
-          }
-        />
-      </ListItem>
-      <Divider />
-    </Box>
-  );
+    const lockString = topic.isLocked
+      ? "Locked"
+      : "Can be locked: " + canBeLockedString;
+
+    return (
+      <Box key={topic.topicString}>
+        <ListItem disablePadding>
+          <ListItemButton onClick={() => showTopic(topic)}>
+            <ListItemText
+              primary={topic.topicString + " : " + topic.lastCommentString}
+              secondary={
+                "Fee Multiplier: " +
+                topic.feeMultiplier.toString() +
+                " - " +
+                "Raised: " +
+                formatSol(topic.raised) +
+                " - " +
+                "Comment Count: " +
+                topic.commentCount.toString() +
+                " - " +
+                lockString
+              }
+            />
+          </ListItemButton>
+        </ListItem>
+        <Divider />
+      </Box>
+    );
+  }
 }

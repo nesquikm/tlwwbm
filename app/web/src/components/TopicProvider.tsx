@@ -87,7 +87,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         try {
           const data = await program.account.topic.fetch(topicPDA);
           console.log("Fetched topic data:", data);
-          setTopicData(topicData);
+          setTopicData(data);
         } catch (error) {
           console.error("Error fetching topic data:", error);
           setTopicData(undefined);

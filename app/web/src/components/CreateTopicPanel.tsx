@@ -30,8 +30,8 @@ export default function CreateTopicPanel() {
 
   function createData() {
     createTopicData({
-      topicString: topicString,
-      lastCommentString: commentString,
+      topicString: topicString.trim(),
+      lastCommentString: commentString.trim(),
       feeMultiplier: feeMultiplier,
     });
   }
