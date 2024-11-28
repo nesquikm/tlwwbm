@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { formatSol, LAMPORTS_PER_SOL } from "./helpers";
 import { useUser } from "./UserProvider";
-import { ConfigContext } from "./ConfigProvider";
+import { useConfig } from "./ConfigProvider";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid2";
 import { BN } from "@coral-xyz/anchor";
@@ -15,8 +15,7 @@ export default function AdminPanel() {
   const { publicKey } = useWallet();
 
   const { userData } = useUser();
-  const { configData, updateConfigData, initConfigData, deleteConfigData } =
-    useContext(ConfigContext);
+  const { configData, updateConfigData, initConfigData, deleteConfigData } = useConfig();
 
   const [tFee, setTFee] = useState(configData?.tFee ?? new BN(0));
   const [cFee, setCFee] = useState(configData?.cFee ?? new BN(0));

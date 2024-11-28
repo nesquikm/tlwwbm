@@ -2,6 +2,7 @@ import {
   createContext,
   type FC,
   type ReactNode,
+  useContext,
   useEffect,
   useState,
 } from "react";
@@ -171,4 +172,13 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
       {children}
     </ConfigContext.Provider>
   );
+};
+
+// Custom hook to use the ConfigContext
+export const useConfig = () => {
+  const context = useContext(ConfigContext);
+  if (context === undefined) {
+    throw new Error("useConfig must be used within a ConfigProvider");
+  }
+  return context;
 };
