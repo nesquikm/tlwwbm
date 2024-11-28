@@ -46,10 +46,15 @@ export default function TopicsPanel() {
 }
 
 function TopicListItem(topic: TopicData) {
+  const canBeLockedDate = topic.canBeLockedAfter.toNumber() * 1000;
+  const canBeLockedString =
+    Date.now() > canBeLockedDate
+      ? "NOW"
+      : new Date(canBeLockedDate).toLocaleString();
+
   const lockString = topic.isLocked
     ? "Locked"
-    : "Can be locked: " +
-      new Date(topic.canBeLockedAfter.toNumber() * 1000).toLocaleString();
+    : "Can be locked: " + canBeLockedString;
 
   return (
     <Box key={topic.topicString}>
