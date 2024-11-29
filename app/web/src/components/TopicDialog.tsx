@@ -1,4 +1,9 @@
-import { useTopic, TopicProvider, TopicData } from "./TopicProvider";
+import {
+  useTopic,
+  TopicProvider,
+  TopicData,
+  CommentTopicData,
+} from "./TopicProvider";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -9,6 +14,8 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import DialogActions from "@mui/material/DialogActions";
 import { BN } from "@coral-xyz/anchor";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import { useState } from "react";
 
 export interface TopicDialogProps {
   topicString: string | null;
@@ -27,7 +34,7 @@ export default function TopicDialog({
 }
 
 function TopicDialogContent({ onClose, topicString }: TopicDialogProps) {
-  const { topicData, lockTopicData, deleteTopicData } =
+  const { topicData, lockTopicData, deleteTopicData, commentTopicData } =
     useTopic();
 
   const open = topicString !== null;
@@ -41,6 +48,7 @@ function TopicDialogContent({ onClose, topicString }: TopicDialogProps) {
       ) : (
         <TopicDialogContentFound
           topicData={topicData}
+          onCommentTopicData={commentTopicData}
           onDeleteTopicData={deleteTopicData}
           onLockTopicData={lockTopicData}
         />
@@ -51,14 +59,17 @@ function TopicDialogContent({ onClose, topicString }: TopicDialogProps) {
 
 function TopicDialogContentFound({
   topicData,
+  onCommentTopicData,
   onDeleteTopicData,
   onLockTopicData,
 }: {
   topicData: TopicData;
+  onCommentTopicData: (data: CommentTopicData) => void;
   onDeleteTopicData: () => void;
   onLockTopicData: () => void;
 }) {
   const { publicKey } = useWallet();
+  const [newCommentString, setNewCommentString] = useState("");
 
   const userIsAuthor = publicKey?.equals(topicData.topicAuthor) ?? false;
   const isLocked = topicData.isLocked;
@@ -67,6 +78,9 @@ function TopicDialogContentFound({
     !isLocked &&
     publicKey != null &&
     topicData.canBeLockedAfter.lte(new BN(Date.now() / 1000));
+  const canBeCommented = publicKey !== null && !isLocked;
+
+  const commentButtonDisabled = newCommentString.trim() === "";
 
   return (
     <Box>
@@ -75,11 +89,28 @@ function TopicDialogContentFound({
         <DialogContentText>
           Last Comment: {topicData?.lastCommentString}
         </DialogContentText>
+        {canBeCommented && (
+          <TextField
+            fullWidth
+            label="New comment"
+            onChange={(e) => setNewCommentString(e.target.value)}
+            sx={{ mt: 2, minWidth: 300 }}
+          />
+        )}
       </DialogContent>
       <DialogActions>
-        {canBeLocked && (
-          <Button onClick={onLockTopicData}>Lock Topic</Button>
+        {canBeCommented && (
+          <Button
+            variant="contained"
+            onClick={() =>
+              onCommentTopicData({ commentString: newCommentString.trim() })
+            }
+            disabled={commentButtonDisabled}
+          >
+            Comment
+          </Button>
         )}
+        {canBeLocked && <Button onClick={onLockTopicData}>Lock Topic</Button>}
         {canBeDeleted && (
           <Button onClick={onDeleteTopicData}>Delete Topic</Button>
         )}

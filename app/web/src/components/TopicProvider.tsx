@@ -31,13 +31,13 @@ export type TopicData = {
   raised: BN;
 };
 
-type CreateTopicData = {
+export type CreateTopicData = {
   topicString: string;
   lastCommentString: string;
   feeMultiplier: BN;
 };
 
-type CommentTopicData = {
+export type CommentTopicData = {
   commentString: string;
 };
 
