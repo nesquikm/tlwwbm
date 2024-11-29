@@ -69,7 +69,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
   const { program } = useProgram();
   const { connection } = useConnection();
   const { configData } = useConfig();
-  const { showError } = useMessenger();
+  const { showError, showMessage } = useMessenger();
 
   const [topicData, setTopicData] = useState<TopicData | null | undefined>(
     null
@@ -92,7 +92,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
           console.log("Fetched topic data:", data);
           setTopicData(data);
         } catch (error) {
-          showError("Error fetching topic data:", error);
+          console.error("Error fetching topic data:", error);
           setTopicData(undefined);
         }
       };
@@ -140,6 +140,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent create topic transaction:", transactionSignature);
+      showMessage("Topic created successfully");
       return true;
     } catch (error) {
       showError("Error creating topic data", error);
@@ -161,6 +162,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent comment topic transaction:", transactionSignature);
+      showMessage("Comment added successfully");
       return true;
     } catch (error) {
       showError("Error commenting topic data:", error);
@@ -185,6 +187,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent lock topic transaction:", transactionSignature);
+      showMessage("Topic locked successfully");
       return true;
     } catch (error) {
       showError("Error locking topic data:", error);
@@ -206,6 +209,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent delete topic transaction:", transactionSignature);
+      showMessage("Topic deleted successfully");
       return true;
     } catch (error) {
       showError("Error deleting topic data:", error);
