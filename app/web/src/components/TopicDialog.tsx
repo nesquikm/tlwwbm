@@ -155,7 +155,7 @@ function TopicDialogContentNotFound() {
       <DialogTitle>Topic Not Found</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          The topic you are looking for does not exist.
+          The topic you are looking for does not exist. It's possible that it was deleted or just in the process of being created.
         </DialogContentText>
       </DialogContent>
     </Box>

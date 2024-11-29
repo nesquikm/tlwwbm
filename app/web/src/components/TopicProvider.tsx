@@ -43,10 +43,10 @@ export type CommentTopicData = {
 
 interface TopicContextState {
   topicData: TopicData | null | undefined;
-  createTopicData: (topicData: CreateTopicData) => void;
-  commentTopicData: (topicData: CommentTopicData) => void;
-  lockTopicData: () => void;
-  deleteTopicData: () => void;
+  createTopicData: (topicData: CreateTopicData) => Promise<boolean>;
+  commentTopicData: (topicData: CommentTopicData) => Promise<boolean>;
+  lockTopicData: () => Promise<boolean>;
+  deleteTopicData: () => Promise<boolean>;
   getTopics: () => Promise<TopicData[]>;
 }
 
@@ -137,8 +137,10 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent create topic transaction:", transactionSignature);
+      return true;
     } catch (error) {
       console.error("Error creating topic data:", error);
+      return false;
     }
   };
 
@@ -156,8 +158,10 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent comment topic transaction:", transactionSignature);
+      return true;
     } catch (error) {
       console.error("Error commenting topic data:", error);
+      return false;
     }
   };
 
@@ -172,8 +176,10 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent lock topic transaction:", transactionSignature);
+      return true;
     } catch (error) {
       console.error("Error locking topic data:", error);
+      return false;
     }
   };
 
@@ -191,8 +197,10 @@ export const TopicProvider: FC<TopicProviderProps> = ({
         connection
       );
       console.log("Sent delete topic transaction:", transactionSignature);
+      return true;
     } catch (error) {
       console.error("Error deleting topic data:", error);
+      return false;
     }
   };
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { getTopicInfoString } from "./helpers";
+import { getTopicInfoString, getTopicUrl } from "./helpers";
 import { useTopic, TopicData } from "./TopicProvider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -63,7 +63,7 @@ export default function TopicsPanel() {
   );
 
   function showTopic(topic: TopicData) {
-    navigate("?topic=" + topic.topicString);
+    navigate(getTopicUrl(topic.topicString));
   }
 
   function TopicListItem(topic: TopicData) {

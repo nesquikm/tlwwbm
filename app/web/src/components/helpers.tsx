@@ -33,3 +33,7 @@ export function getTopicInfoString(topic: TopicData) {
     lockString
   );
 }
+
+export function getTopicUrl(topicString: string) {
+  return "?topic=" + topicString;
+}
