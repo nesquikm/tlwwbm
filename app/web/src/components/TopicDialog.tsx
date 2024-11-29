@@ -19,6 +19,7 @@ import { useState } from "react";
 import Typography from "@mui/material/Typography";
 import { formatSol, getTopicInfoString } from "./helpers";
 import { useConfig } from "./ConfigProvider";
+import Grid from "@mui/material/Grid2";
 
 export interface TopicDialogProps {
   topicString: string | null;
@@ -78,7 +79,8 @@ function TopicDialogContentFound({
 
   const userIsAuthor = publicKey?.equals(topicData.topicAuthor) ?? false;
   const isLocked = topicData.isLocked;
-  const canBeDeleted = userIsAuthor && topicData.commentCount.eq(new BN(0)) && !isLocked;
+  const canBeDeleted =
+    userIsAuthor && topicData.commentCount.eq(new BN(0)) && !isLocked;
   const canBeLocked =
     !isLocked &&
     publicKey != null &&
@@ -118,9 +120,23 @@ function TopicDialogContentFound({
     });
   }
 
+  function copyURL() {
+    navigator.clipboard.writeText(window.location.href);
+  }
+
   return (
-    <Box>
-      <DialogTitle>{topicData?.topicString}</DialogTitle>
+    <Box sx={{ minWidth: 300 }}>
+      <DialogTitle>
+        <Grid container>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {" "}
+            {topicData?.topicString}
+          </Typography>
+          <Button onClick={copyURL} disabled={busy}>
+            Copy URL
+          </Button>
+        </Grid>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText>
           Last Comment: {topicData?.lastCommentString}
@@ -153,28 +169,30 @@ function TopicDialogContentFound({
           </Box>
         )}
       </DialogContent>
-      <DialogActions>
-        {canBeCommented && (
-          <Button
-            variant="contained"
-            onClick={commentData}
-            disabled={commentButtonDisabled || busy}
-          >
-            Comment
-          </Button>
-        )}
-        {canBeLocked && (
-          <Button onClick={lockData} disabled={busy}>
-            Lock Topic
-          </Button>
-        )}
-        {canBeDeleted && (
-          <Button onClick={deleteData} disabled={busy}>
-            Delete Topic
-          </Button>
-        )}
-        {busy && <CircularProgress size={32} sx={{ m: 2 }} />}
-      </DialogActions>
+      {(canBeCommented || canBeLocked || canBeDeleted || busy) && (
+        <DialogActions>
+          {canBeCommented && (
+            <Button
+              variant="contained"
+              onClick={commentData}
+              disabled={commentButtonDisabled || busy}
+            >
+              Comment
+            </Button>
+          )}
+          {canBeLocked && (
+            <Button onClick={lockData} disabled={busy}>
+              Lock Topic
+            </Button>
+          )}
+          {canBeDeleted && (
+            <Button onClick={deleteData} disabled={busy}>
+              Delete Topic
+            </Button>
+          )}
+          {busy && <CircularProgress size={32} sx={{ m: 2 }} />}
+        </DialogActions>
+      )}
     </Box>
   );
 }
