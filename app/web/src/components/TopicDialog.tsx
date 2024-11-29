@@ -16,6 +16,9 @@ import { BN } from "@coral-xyz/anchor";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
+import Typography from "@mui/material/Typography";
+import { formatSol, getTopicInfoString } from "./helpers";
+import { useConfig } from "./ConfigProvider";
 
 export interface TopicDialogProps {
   topicString: string | null;
@@ -69,6 +72,7 @@ function TopicDialogContentFound({
   onLockTopicData: () => void;
 }) {
   const { publicKey } = useWallet();
+  const { configData } = useConfig();
   const [newCommentString, setNewCommentString] = useState("");
 
   const userIsAuthor = publicKey?.equals(topicData.topicAuthor) ?? false;
@@ -82,6 +86,11 @@ function TopicDialogContentFound({
 
   const commentButtonDisabled = newCommentString.trim() === "";
 
+  const commentCost =
+    configData?.cFee
+      ?.add(configData?.cFeeIncrement.mul(topicData.commentCount))
+      .mul(new BN(topicData.feeMultiplier)) ?? new BN(0);
+
   return (
     <Box>
       <DialogTitle>{topicData?.topicString}</DialogTitle>
@@ -90,12 +99,29 @@ function TopicDialogContentFound({
           Last Comment: {topicData?.lastCommentString}
         </DialogContentText>
         {canBeCommented && (
-          <TextField
-            fullWidth
-            label="New comment"
-            onChange={(e) => setNewCommentString(e.target.value)}
-            sx={{ mt: 2, minWidth: 300 }}
-          />
+          <Box>
+            <TextField
+              fullWidth
+              label="New comment"
+              onChange={(e) => setNewCommentString(e.target.value)}
+              sx={{ mt: 2, minWidth: 300 }}
+            />
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              It will cost you {formatSol(commentCost)} SOL to comment this
+              topic.
+            </Typography>
+          </Box>
+        )}
+        {publicKey !== null && (
+          <Box>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              Last Comment Author is{" "}
+              {topicData?.lastCommentAuthor.equals(publicKey) ? "" : "not "}you.
+            </Typography>
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              {getTopicInfoString(topicData)}
+            </Typography>
+          </Box>
         )}
       </DialogContent>
       <DialogActions>

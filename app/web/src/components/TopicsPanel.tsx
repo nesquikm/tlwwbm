@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { formatSol } from "./helpers";
+import { getTopicInfoString } from "./helpers";
 import { useTopic, TopicData } from "./TopicProvider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -58,10 +58,7 @@ export default function TopicsPanel() {
       <List sx={{ width: "100%" }}>
         {topics.map((topic) => TopicListItem(topic))}
       </List>
-      <TopicDialog
-        topicString={activeTopic}
-        onClose={onTopicDialogClose}
-      />
+      <TopicDialog topicString={activeTopic} onClose={onTopicDialogClose} />
     </Paper>
   );
 
@@ -70,34 +67,13 @@ export default function TopicsPanel() {
   }
 
   function TopicListItem(topic: TopicData) {
-    const canBeLockedDate = topic.canBeLockedAfter.toNumber() * 1000;
-    const canBeLockedString =
-      Date.now() > canBeLockedDate
-        ? "NOW"
-        : new Date(canBeLockedDate).toLocaleString();
-
-    const lockString = topic.isLocked
-      ? "Locked"
-      : "Can be locked: " + canBeLockedString;
-
     return (
       <Box key={topic.topicString}>
         <ListItem disablePadding>
           <ListItemButton onClick={() => showTopic(topic)}>
             <ListItemText
               primary={topic.topicString + " : " + topic.lastCommentString}
-              secondary={
-                "Fee Multiplier: " +
-                topic.feeMultiplier.toString() +
-                " - " +
-                "Raised: " +
-                formatSol(topic.raised) +
-                " - " +
-                "Comment Count: " +
-                topic.commentCount.toString() +
-                " - " +
-                lockString
-              }
+              secondary={getTopicInfoString(topic)}
             />
           </ListItemButton>
         </ListItem>
