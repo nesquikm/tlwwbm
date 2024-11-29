@@ -67,17 +67,18 @@ function TopicDialogContentFound({
   onLockTopicData,
 }: {
   topicData: TopicData;
-  onCommentTopicData: (data: CommentTopicData) => void;
-  onDeleteTopicData: () => void;
-  onLockTopicData: () => void;
+  onCommentTopicData: (data: CommentTopicData) => Promise<boolean>;
+  onDeleteTopicData: () => Promise<boolean>;
+  onLockTopicData: () => Promise<boolean>;
 }) {
   const { publicKey } = useWallet();
   const { configData } = useConfig();
   const [newCommentString, setNewCommentString] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const userIsAuthor = publicKey?.equals(topicData.topicAuthor) ?? false;
   const isLocked = topicData.isLocked;
-  const canBeDeleted = userIsAuthor && topicData.commentCount.eq(new BN(0));
+  const canBeDeleted = userIsAuthor && topicData.commentCount.eq(new BN(0)) && !isLocked;
   const canBeLocked =
     !isLocked &&
     publicKey != null &&
@@ -91,6 +92,32 @@ function TopicDialogContentFound({
       ?.add(configData?.cFeeIncrement.mul(topicData.commentCount))
       .mul(new BN(topicData.feeMultiplier)) ?? new BN(0);
 
+  function commentData() {
+    setBusy(true);
+    onCommentTopicData({ commentString: newCommentString.trim() }).then(
+      (result) => {
+        setBusy(false);
+        if (result) {
+          setNewCommentString("");
+        }
+      }
+    );
+  }
+
+  function lockData() {
+    setBusy(true);
+    onLockTopicData().then(() => {
+      setBusy(false);
+    });
+  }
+
+  function deleteData() {
+    setBusy(true);
+    onDeleteTopicData().then(() => {
+      setBusy(false);
+    });
+  }
+
   return (
     <Box>
       <DialogTitle>{topicData?.topicString}</DialogTitle>
@@ -103,8 +130,10 @@ function TopicDialogContentFound({
             <TextField
               fullWidth
               label="New comment"
+              value={newCommentString}
               onChange={(e) => setNewCommentString(e.target.value)}
               sx={{ mt: 2, minWidth: 300 }}
+              disabled={busy}
             />
             <Typography variant="body1" sx={{ mt: 2 }}>
               It will cost you {formatSol(commentCost)} SOL to comment this
@@ -128,18 +157,23 @@ function TopicDialogContentFound({
         {canBeCommented && (
           <Button
             variant="contained"
-            onClick={() =>
-              onCommentTopicData({ commentString: newCommentString.trim() })
-            }
-            disabled={commentButtonDisabled}
+            onClick={commentData}
+            disabled={commentButtonDisabled || busy}
           >
             Comment
           </Button>
         )}
-        {canBeLocked && <Button onClick={onLockTopicData}>Lock Topic</Button>}
-        {canBeDeleted && (
-          <Button onClick={onDeleteTopicData}>Delete Topic</Button>
+        {canBeLocked && (
+          <Button onClick={lockData} disabled={busy}>
+            Lock Topic
+          </Button>
         )}
+        {canBeDeleted && (
+          <Button onClick={deleteData} disabled={busy}>
+            Delete Topic
+          </Button>
+        )}
+        {busy && <CircularProgress size={32} sx={{ m: 2 }} />}
       </DialogActions>
     </Box>
   );
@@ -155,7 +189,8 @@ function TopicDialogContentNotFound() {
       <DialogTitle>Topic Not Found</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          The topic you are looking for does not exist. It's possible that it was deleted or just in the process of being created.
+          The topic you are looking for does not exist. It's possible that it
+          was deleted or just in the process of being created.
         </DialogContentText>
       </DialogContent>
     </Box>

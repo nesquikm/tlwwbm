@@ -10,6 +10,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useProgram } from "./ProgramProvider";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
+import { useConfig } from "./ConfigProvider";
 
 const accountName = "topic";
 
@@ -65,8 +66,8 @@ export const TopicProvider: FC<TopicProviderProps> = ({
 }) => {
   const { sendTransaction, publicKey } = useWallet();
   const { program } = useProgram();
-
   const { connection } = useConnection();
+  const { configData } = useConfig();
 
   const [topicData, setTopicData] = useState<TopicData | null | undefined>(
     null
@@ -169,6 +170,12 @@ export const TopicProvider: FC<TopicProviderProps> = ({
     try {
       const transaction = await program.methods
         .topicLock(topicString!)
+        .accounts({
+          authority: publicKey!,
+          admin: configData!.admin,
+          topicAuthor: topicData!.topicAuthor,
+          lastCommentAuthor: topicData!.lastCommentAuthor,
+        })
         .transaction();
 
       const transactionSignature = await sendTransaction(
