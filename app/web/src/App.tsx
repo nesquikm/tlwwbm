@@ -19,6 +19,8 @@ import { ConfigProvider } from "./components/ConfigProvider";
 import CreateTopicPanel from "./components/CreateTopicPanel";
 import { TopicProvider } from "./components/TopicProvider";
 import TopicsPanel from "./components/TopicsPanel";
+import { SnackbarProvider } from "notistack";
+import { MessengerProvider } from "./components/MessengerProvider";
 
 function App() {
   const [endpoint, setEndpoint] = useState(getDefaultEndpoint());
@@ -27,41 +29,45 @@ function App() {
   console.log("Selected endpoint", endpoint);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletDialogProvider>
-          <UserProvider>
-            <ProgramProvider>
-              <ConfigProvider>
-                <Container>
-                  <AppBar position="static">
-                    <Toolbar>
-                      <Typography
-                        variant="h6"
-                        component="div"
-                        sx={{ flexGrow: 1 }}
-                      >
-                        The Last Word Will Be Mine!
-                      </Typography>
-                      <WalletMultiButton />
-                      <SelectNetwork
-                        endpoint={endpoint}
-                        setEndpoint={setEndpoint}
-                      />
-                    </Toolbar>
-                  </AppBar>
-                  <AdminPanel />
-                  <TopicProvider topicString={null}>
-                    <CreateTopicPanel />
-                    <TopicsPanel />
-                  </TopicProvider>
-                </Container>
-              </ConfigProvider>
-            </ProgramProvider>
-          </UserProvider>
-        </WalletDialogProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <SnackbarProvider>
+      <MessengerProvider>
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletDialogProvider>
+              <UserProvider>
+                <ProgramProvider>
+                  <ConfigProvider>
+                    <Container>
+                      <AppBar position="static">
+                        <Toolbar>
+                          <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ flexGrow: 1 }}
+                          >
+                            The Last Word Will Be Mine!
+                          </Typography>
+                          <WalletMultiButton />
+                          <SelectNetwork
+                            endpoint={endpoint}
+                            setEndpoint={setEndpoint}
+                          />
+                        </Toolbar>
+                      </AppBar>
+                      <AdminPanel />
+                      <TopicProvider topicString={null}>
+                        <CreateTopicPanel />
+                        <TopicsPanel />
+                      </TopicProvider>
+                    </Container>
+                  </ConfigProvider>
+                </ProgramProvider>
+              </UserProvider>
+            </WalletDialogProvider>
+          </WalletProvider>
+        </ConnectionProvider>
+      </MessengerProvider>
+    </SnackbarProvider>
   );
 }
 

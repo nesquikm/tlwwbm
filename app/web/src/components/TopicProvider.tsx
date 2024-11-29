@@ -11,6 +11,7 @@ import { useProgram } from "./ProgramProvider";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import { useConfig } from "./ConfigProvider";
+import { useMessenger } from "./MessengerProvider";
 
 const accountName = "topic";
 
@@ -68,6 +69,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
   const { program } = useProgram();
   const { connection } = useConnection();
   const { configData } = useConfig();
+  const { showError } = useMessenger();
 
   const [topicData, setTopicData] = useState<TopicData | null | undefined>(
     null
@@ -90,7 +92,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
           console.log("Fetched topic data:", data);
           setTopicData(data);
         } catch (error) {
-          console.error("Error fetching topic data:", error);
+          showError("Error fetching topic data:", error);
           setTopicData(undefined);
         }
       };
@@ -108,7 +110,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
             );
             setTopicData(decodedData);
           } catch (error) {
-            console.error("Error decoding topic data:", error);
+            showError("Error decoding topic data:", error);
             setTopicData(undefined);
           }
         }
@@ -140,7 +142,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
       console.log("Sent create topic transaction:", transactionSignature);
       return true;
     } catch (error) {
-      console.error("Error creating topic data:", error);
+      showError("Error creating topic data", error);
       return false;
     }
   };
@@ -161,7 +163,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
       console.log("Sent comment topic transaction:", transactionSignature);
       return true;
     } catch (error) {
-      console.error("Error commenting topic data:", error);
+      showError("Error commenting topic data:", error);
       return false;
     }
   };
@@ -185,7 +187,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
       console.log("Sent lock topic transaction:", transactionSignature);
       return true;
     } catch (error) {
-      console.error("Error locking topic data:", error);
+      showError("Error locking topic data:", error);
       return false;
     }
   };
@@ -206,7 +208,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
       console.log("Sent delete topic transaction:", transactionSignature);
       return true;
     } catch (error) {
-      console.error("Error deleting topic data:", error);
+      showError("Error deleting topic data:", error);
       return false;
     }
   };
@@ -238,7 +240,7 @@ export const TopicProvider: FC<TopicProviderProps> = ({
       console.log("Fetched topic:", decodedTopics);
       return decodedTopics;
     } catch (error) {
-      console.error("Error fetching topics:", error);
+      showError("Error fetching topics:", error);
       return [];
     }
   };

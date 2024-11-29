@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { BN } from "@coral-xyz/anchor";
+import { useMessenger } from "./MessengerProvider";
 
 // Define the type alias for userData
 type UserData = { balance: BN };
@@ -25,6 +26,7 @@ interface UserProviderProps {
 export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const { publicKey } = useWallet();
   const { connection } = useConnection();
+  const { showError } = useMessenger();
 
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -40,7 +42,7 @@ export const UserProvider: FC<UserProviderProps> = ({ children }) => {
           setUserData({ balance: new BN(balance) });
         });
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        showError("Error fetching user data:", error);
       }
     };
 

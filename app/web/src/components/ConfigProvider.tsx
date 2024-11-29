@@ -10,6 +10,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useProgram } from "./ProgramProvider";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
+import { useMessenger } from "./MessengerProvider";
 
 const accountName = "config";
 
@@ -50,6 +51,7 @@ interface ConfigProviderProps {
 export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
   const { sendTransaction, publicKey } = useWallet();
   const { program } = useProgram();
+  const { showError } = useMessenger();
 
   const [configPDA] = PublicKey.findProgramAddressSync(
     [Buffer.from(accountName)],
@@ -71,7 +73,7 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
         console.log("Fetched config data:", data);
         setConfigData(data);
       } catch (error) {
-        console.error("Error fetching config data:", error);
+        showError("Error fetching config data:", error);
         setConfigData(undefined);
       }
     };
@@ -89,7 +91,7 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
           );
           setConfigData(decodedData);
         } catch (error) {
-          console.error("Error decoding config data:", error);
+          showError("Error decoding config data:", error);
         }
       }
     );
@@ -120,7 +122,7 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
       );
       console.log(`Config data changed: ${transactionSignature}`);
     } catch (error) {
-      console.error("Error setting config data:", error);
+      showError("Error setting config data:", error);
     }
   };
 
@@ -138,7 +140,7 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
       );
       console.log(`Config data initialized: ${transactionSignature}`);
     } catch (error) {
-      console.error("Error initializing config data:", error);
+      showError("Error initializing config data:", error);
     }
   };
 
@@ -156,7 +158,7 @@ export const ConfigProvider: FC<ConfigProviderProps> = ({ children }) => {
       );
       console.log(`Config data deleted: ${transactionSignature}`);
     } catch (error) {
-      console.error("Error deleting config data:", error);
+      showError("Error deleting config data:", error);
     }
   };
 
