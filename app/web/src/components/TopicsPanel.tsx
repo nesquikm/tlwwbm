@@ -14,11 +14,13 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import ListItemButton from "@mui/material/ListItemButton";
 import { useLocation, useNavigate } from "react-router";
 import TopicDialog from "./TopicDialog";
+import { useUser } from "./UserProvider";
 
 export default function TopicsPanel() {
   const { getTopics } = useTopic();
   let location = useLocation();
   let navigate = useNavigate();
+  const { userData } = useUser();
 
   const [topics, setTopics] = useState([] as TopicData[]);
   const [activeTopic, setActiveTopic] = useState(null as string | null);
@@ -36,10 +38,8 @@ export default function TopicsPanel() {
   }, [location]);
 
   useEffect(() => {
-    setTopics([]);
-
     fetchTopics();
-  }, []);
+  }, [userData]);
 
   function onTopicDialogClose() {
     navigate("");
