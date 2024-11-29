@@ -55,6 +55,7 @@ function TopicDialogContent({ onClose, topicString }: TopicDialogProps) {
           onCommentTopicData={commentTopicData}
           onDeleteTopicData={deleteTopicData}
           onLockTopicData={lockTopicData}
+          onClose={onClose}
         />
       )}
     </Dialog>
@@ -66,11 +67,13 @@ function TopicDialogContentFound({
   onCommentTopicData,
   onDeleteTopicData,
   onLockTopicData,
+  onClose,
 }: {
   topicData: TopicData;
   onCommentTopicData: (data: CommentTopicData) => Promise<boolean>;
   onDeleteTopicData: () => Promise<boolean>;
   onLockTopicData: () => Promise<boolean>;
+  onClose: () => void;
 }) {
   const { publicKey } = useWallet();
   const { configData } = useConfig();
@@ -115,8 +118,11 @@ function TopicDialogContentFound({
 
   function deleteData() {
     setBusy(true);
-    onDeleteTopicData().then(() => {
+    onDeleteTopicData().then((result) => {
       setBusy(false);
+      if (result) {
+        onClose();
+      }
     });
   }
 
