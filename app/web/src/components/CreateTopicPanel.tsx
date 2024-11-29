@@ -13,6 +13,7 @@ import Slider from "@mui/material/Slider";
 import Grid from "@mui/material/Grid2";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router";
+import { useUser } from "./UserProvider";
 
 const maxFeeMultiplier = 100;
 
@@ -20,6 +21,7 @@ export default function CreateTopicPanel() {
   const { publicKey } = useWallet();
   const { configData } = useConfig();
   const { createTopicData } = useTopic();
+  const { userData } = useUser();
   let navigate = useNavigate();
 
   const [topicString, setTopicString] = useState("");
@@ -90,6 +92,8 @@ export default function CreateTopicPanel() {
         It will cost you{" "}
         {formatSol(configData?.tFee?.mul(new BN(feeMultiplier)) ?? new BN(0))}{" "}
         SOL to create this topic.
+        Currently you have{" "}
+        {formatSol(userData?.balance ?? new BN(0))} SOL.
       </Typography>
       <Typography variant="body2" sx={{ mt: 2 }}>
         First comment will cost{" "}

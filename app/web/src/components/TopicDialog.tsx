@@ -20,6 +20,7 @@ import Typography from "@mui/material/Typography";
 import { formatSol, getTopicInfoString } from "./helpers";
 import { useConfig } from "./ConfigProvider";
 import Grid from "@mui/material/Grid2";
+import { useUser } from "./UserProvider";
 
 export interface TopicDialogProps {
   topicString: string | null;
@@ -77,6 +78,7 @@ function TopicDialogContentFound({
 }) {
   const { publicKey } = useWallet();
   const { configData } = useConfig();
+  const { userData } = useUser();
   const [newCommentString, setNewCommentString] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -159,7 +161,8 @@ function TopicDialogContentFound({
             />
             <Typography variant="body1" sx={{ mt: 2 }}>
               It will cost you {formatSol(commentCost)} SOL to comment this
-              topic.
+              topic. Currently you have{" "}
+              {formatSol(userData?.balance ?? new BN(0))} SOL.
             </Typography>
           </Box>
         )}
