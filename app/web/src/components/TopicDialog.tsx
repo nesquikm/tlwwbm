@@ -162,6 +162,7 @@ function TopicDialogContentFound({
               onChange={(e) => setNewCommentString(e.target.value)}
               sx={{ mt: 2, minWidth: 300 }}
               disabled={busy}
+              slotProps={{ htmlInput: { maxLength: 128 } }}
             />
             <Typography variant="body1" sx={{ mt: 2 }}>
               It will cost you {formatSol(commentCost)} SOL to comment this

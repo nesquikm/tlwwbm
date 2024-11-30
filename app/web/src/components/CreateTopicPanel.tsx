@@ -64,6 +64,7 @@ export default function CreateTopicPanel() {
         value={topicString}
         onChange={(e) => setTopicString(e.target.value)}
         disabled={busy}
+        slotProps={{ htmlInput: { maxLength: 32 } }}
       />
       <TextField
         fullWidth
@@ -72,6 +73,7 @@ export default function CreateTopicPanel() {
         value={commentString}
         onChange={(e) => setCommentString(e.target.value)}
         disabled={busy}
+        slotProps={{ htmlInput: { maxLength: 128 } }}
       />
       <Typography variant="body2" sx={{ mt: 2 }}>
         Fee Multiplier: {feeMultiplier.toString()}
@@ -91,8 +93,7 @@ export default function CreateTopicPanel() {
       <Typography variant="body1" sx={{ mt: 2 }}>
         It will cost you{" "}
         {formatSol(configData?.tFee?.mul(new BN(feeMultiplier)) ?? new BN(0))}{" "}
-        SOL to create this topic.
-        Currently you have{" "}
+        SOL to create this topic. Currently you have{" "}
         {formatSol(userData?.balance ?? new BN(0))} SOL.
       </Typography>
       <Typography variant="body2" sx={{ mt: 2 }}>
