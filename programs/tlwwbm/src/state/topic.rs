@@ -84,6 +84,11 @@ impl Topic {
     }
     pub fn comment(&mut self, author: &Pubkey, comment_string: String, deposit: u64) -> Result<()> {
         require!(self.is_locked == false, TopicError::Locked);
+        require!(!comment_string.is_empty(), TopicError::CommentStringEmpty);
+        require!(
+            comment_string.len() <= COMMENT_STRING_MAX_LEN,
+            TopicError::CommentStringTooLong
+        );
 
         let now = Clock::get().unwrap().unix_timestamp;
 
