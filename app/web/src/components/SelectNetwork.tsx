@@ -22,15 +22,15 @@ export default function SelectNetwork({ endpoint, setEndpoint }: SelectNetworkPr
     <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
       <InputLabel>Network</InputLabel>
       <Select value={endpoint} label="Network" onChange={handleChange}>
-        <MenuItem value={clusterApiUrl(WalletAdapterNetwork.Mainnet)}>Mainnet</MenuItem>
-        <MenuItem value={quicknodeMainNet}>Mainnet (QuickNode)</MenuItem>
+        {/* <MenuItem value={clusterApiUrl(WalletAdapterNetwork.Mainnet)}>Mainnet</MenuItem> */}
+        <MenuItem value={quicknodeMainNet}>Mainnet</MenuItem>
         <MenuItem value={clusterApiUrl(WalletAdapterNetwork.Devnet)}>Devnet</MenuItem>
-        <MenuItem value={clusterApiUrl(WalletAdapterNetwork.Testnet)}>Testnet</MenuItem>
+        {/* <MenuItem value={clusterApiUrl(WalletAdapterNetwork.Testnet)}>Testnet</MenuItem> */}
       </Select>
     </FormControl>
   );
 }
 
 export function getDefaultEndpoint() {
-  return clusterApiUrl(WalletAdapterNetwork.Devnet);
+  return quicknodeMainNet;
 }
