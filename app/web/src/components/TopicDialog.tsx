@@ -136,7 +136,11 @@ function TopicDialogContentFound({
     <Box sx={{ minWidth: 300 }}>
       <DialogTitle>
         <Grid container>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{ flexGrow: 1 }}
+            style={{ wordBreak: "break-word" }}
+          >
             {" "}
             {topicData?.topicString}
           </Typography>
@@ -146,7 +150,7 @@ function TopicDialogContentFound({
         </Grid>
       </DialogTitle>
       <DialogContent>
-        <DialogContentText>
+        <DialogContentText style={{ wordBreak: "break-word" }}>
           Last Comment: {topicData?.lastCommentString}
         </DialogContentText>
         {canBeCommented && (

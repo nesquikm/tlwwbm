@@ -74,6 +74,8 @@ export default function TopicsPanel() {
             <ListItemText
               primary={topic.topicString + " : " + topic.lastCommentString}
               secondary={getTopicInfoString(topic)}
+              primaryTypographyProps={{ style: { wordBreak: "break-word" } }}
+              secondaryTypographyProps={{ style: { wordBreak: "break-word" } }}
             />
           </ListItemButton>
         </ListItem>
