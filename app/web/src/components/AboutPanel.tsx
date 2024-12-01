@@ -26,7 +26,7 @@ export default function AboutPanel() {
             style={{ width: "40px", marginRight: "10px" }}
           />
           This is a small Solana-based game where players compete to have the
-          last word on various topics. Users can create topics, pay to replace
+          last word on various topics. Users can create topics, replace
           comments, and earn rewards when topics lock after a timeout. With
           growing costs for each comment and unique mechanics, the game blends
           strategy, greed, and fun!
