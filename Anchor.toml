@@ -14,9 +14,14 @@ counter = "38xz437giEUwsXjfHb7mJnYmTysz8jf4qoroPKBbj8aN"
 [registry]
 url = "https://api.apr.dev"
 
+
 [provider]
 cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
+
+# [provider]
+# cluster = "Mainnet"
+# wallet = "~/.config/solana/id.json"
 
 # [provider]
 # cluster = "devnet"
