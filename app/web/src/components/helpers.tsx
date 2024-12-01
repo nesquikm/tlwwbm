@@ -9,6 +9,14 @@ export function formatSol(sol: BN) {
     .replace(/,/g, "");
 }
 
+export function formatDuration(seconds: number) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.round(seconds % 60);
+  const t = [h, m > 9 ? m : h ? "0" + m : m || "0", s > 9 ? s : "0" + s]
+  return `${t[0]} hours ${t[1]} minutes ${t[2]} seconds`;
+}
+
 export function getTopicInfoString(topic: TopicData) {
   const canBeLockedDate = topic.canBeLockedAfter.toNumber() * 1000;
   const canBeLockedString =

@@ -21,6 +21,7 @@ import { TopicProvider } from "./components/TopicProvider";
 import TopicsPanel from "./components/TopicsPanel";
 import { SnackbarProvider } from "notistack";
 import { MessengerProvider } from "./components/MessengerProvider";
+import AboutPanel from "./components/AboutPanel";
 
 function App() {
   const [endpoint, setEndpoint] = useState(getDefaultEndpoint());
@@ -55,6 +56,7 @@ function App() {
                         </Toolbar>
                       </AppBar>
                       <AdminPanel />
+                      <AboutPanel />
                       <TopicProvider topicString={null}>
                         <CreateTopicPanel />
                         <TopicsPanel />
