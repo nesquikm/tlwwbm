@@ -59,7 +59,7 @@ function App() {
                       <AboutPanel />
                       <TopicProvider topicString={null}>
                         <CreateTopicPanel />
-                        <TopicsPanel />
+                        <TopicsPanel endpoint={endpoint} />
                       </TopicProvider>
                     </Container>
                   </ConfigProvider>

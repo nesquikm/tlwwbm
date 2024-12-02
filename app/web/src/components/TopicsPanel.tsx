@@ -16,7 +16,11 @@ import { useLocation, useNavigate } from "react-router";
 import TopicDialog from "./TopicDialog";
 import { useUser } from "./UserProvider";
 
-export default function TopicsPanel() {
+interface TopicsPanelProps {
+  endpoint: string;
+}
+
+export default function TopicsPanel({ endpoint }: TopicsPanelProps) {
   const { getTopics } = useTopic();
   let location = useLocation();
   let navigate = useNavigate();
@@ -39,7 +43,7 @@ export default function TopicsPanel() {
 
   useEffect(() => {
     fetchTopics();
-  }, [userData]);
+  }, [userData, endpoint]);
 
   function onTopicDialogClose() {
     navigate("");
