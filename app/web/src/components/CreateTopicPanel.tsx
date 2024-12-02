@@ -17,7 +17,11 @@ import { useUser } from "./UserProvider";
 
 const maxFeeMultiplier = 100;
 
-export default function CreateTopicPanel() {
+interface CreateTopicPanelProps {
+  endpoint: string;
+}
+
+export default function CreateTopicPanel({ endpoint }: CreateTopicPanelProps) {
   const { publicKey } = useWallet();
   const { configData } = useConfig();
   const { createTopicData } = useTopic();
@@ -48,7 +52,7 @@ export default function CreateTopicPanel() {
       if (result) {
         setTopicString("");
         setCommentString("");
-        navigate(getTopicUrl(newTopicString));
+        navigate(getTopicUrl(newTopicString, endpoint));
       }
     });
   }

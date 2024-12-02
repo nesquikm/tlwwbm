@@ -1,5 +1,6 @@
 import { BN } from "@coral-xyz/anchor";
 import { TopicData } from "./TopicProvider";
+import { getEndpointName } from "./SelectNetwork";
 
 export const LAMPORTS_PER_SOL = 1_000_000_000;
 
@@ -42,6 +43,7 @@ export function getTopicInfoString(topic: TopicData) {
   );
 }
 
-export function getTopicUrl(topicString: string) {
-  return "?topic=" + topicString;
+export function getTopicUrl(topicString: string, endpoint: string) {
+  const endpointString = getEndpointName(endpoint) === "devnet" ? "&endpoint=devnet" : "";
+  return "?topic=" + topicString + endpointString;
 }

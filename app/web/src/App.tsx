@@ -58,7 +58,7 @@ function App() {
                       <AdminPanel />
                       <AboutPanel />
                       <TopicProvider topicString={null}>
-                        <CreateTopicPanel />
+                        <CreateTopicPanel endpoint={endpoint} />
                         <TopicsPanel endpoint={endpoint} />
                       </TopicProvider>
                     </Container>

@@ -67,7 +67,7 @@ export default function TopicsPanel({ endpoint }: TopicsPanelProps) {
   );
 
   function showTopic(topic: TopicData) {
-    navigate(getTopicUrl(topic.topicString));
+    navigate(getTopicUrl(topic.topicString, endpoint));
   }
 
   function TopicListItem(topic: TopicData) {
