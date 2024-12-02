@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: '23'
 
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+          echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
       - name: Install anchor cli
         run: cargo install --git https://github.com/coral-xyz/anchor avm --force
 
@@ -38,5 +43,6 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TLWWBM }}
+          entryPoint: ./app/web
           channelId: live
           projectId: tlwwbm
