@@ -66,7 +66,7 @@ pub fn set(
     topic_author_share: f64,
     last_comment_author_share: f64,
 ) -> Result<()> {
-    msg!("Set topic lock time");
+    msg!("Set config values");
 
     let config = &mut ctx.accounts.config;
     config.set(topic_lock_time, t_fee, c_fee, c_fee_increment, topic_author_share, last_comment_author_share)?;
