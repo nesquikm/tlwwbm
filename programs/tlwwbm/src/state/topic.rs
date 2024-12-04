@@ -32,6 +32,7 @@ pub struct Topic {
 
     pub raised: u64,
 }
+
 impl Topic {
     pub const SEED_PREFIX: &'static str = "topic";
 
