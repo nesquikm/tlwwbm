@@ -9,7 +9,6 @@ import {
   topicFetchLamports,
   newWallet,
   accountFetchLamports,
-  getRentExemption,
 } from "./helpers";
 import { assert } from "chai";
 
